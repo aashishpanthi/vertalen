@@ -683,7 +683,22 @@ function collectTextNodes() {
   ]);
   const NODE_ATTR = "data-vertalen-node";
   const NOISE_SELECTOR =
-    "[data-vertalen-node], [data-vertalen-translated], [data-vertalen-imm-scanned], .vertalen-imm, .vertalen-root";
+    "[data-vertalen-node], [data-vertalen-translated], .vertalen-root";
+
+  document
+    .querySelectorAll(".vertalen-imm[data-vertalen-imm-original]")
+    .forEach((el) => {
+      const original = el.getAttribute("data-vertalen-imm-original");
+      if (original != null) {
+        el.replaceWith(document.createTextNode(original));
+      } else {
+        el.remove();
+      }
+    });
+  document
+    .querySelectorAll("[data-vertalen-imm-scanned]")
+    .forEach((el) => el.removeAttribute("data-vertalen-imm-scanned"));
+  document.body.normalize();
 
   const candidates = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
