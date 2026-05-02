@@ -1,6 +1,6 @@
 # vertalen — Architecture
 
-This document is for evaluators and contributors who want to understand how the pieces fit together.
+This document is for contributors and reviewers who want to understand how the pieces fit together.
 
 ## High-level
 
@@ -9,7 +9,7 @@ This document is for evaluators and contributors who want to understand how the 
 | Surface | Lives at | Purpose |
 |---|---|---|
 | **Service worker** | `background/service-worker.js` | The only context that holds the API key and calls the TMT endpoint. Owns rate limiting, caching, sentence splitting, context menus, keyboard shortcuts. |
-| **Content script** | `content/content.js` | Runs on every web page; renders the floating selection button, tooltip, and full-page progress overlay. Talks to the worker. |
+| **Content script** | `content/content.js` | Runs on every web page (as an ES module); renders the floating selection button, tooltip, and full-page progress overlay. Consults `site-blocklist.js` and waits for `window` `load` before starting immersion. |
 | **Popup** | `popup/popup.html` | Toolbar UI for ad-hoc translation, full-page trigger, and recent history. |
 | **Options page** | `options/options.html` | API key entry, defaults, behavior toggles, performance, translation-memory and history management, About. |
 | **Onboarding** | `onboarding/welcome.html` | First-run flow that opens automatically on install: paste key, run a sample, learn the gestures. |
@@ -63,6 +63,16 @@ Counts Devanagari vs Latin letters and returns:
 
 Devanagari can't be uniquely attributed to Nepali vs Tamang from glyphs alone; the caller resolves that based on the configured target language or user preference.
 
+### `site-blocklist.js`
+
+Shared rules for **where not** to run immersion, full-page translate, reader, or on-page selection translation:
+
+- **Search URLs** — `google.*` with path `/search`, Bing `/search`, Yahoo (`search.yahoo.com` or `*.yahoo.com` with `/search`), and all of `duckduckgo.com`.
+- **Host suffix list** — defaults include major social / video / messaging domains (Facebook, YouTube, Reddit, etc.); users can edit the list in options (`translateBlockedHosts`) or disable the feature with `translateBlocklistEnabled`.
+- **Bot / challenge pages** — lightweight DOM heuristics (title tokens, Cloudflare challenge nodes) so “Checking your browser” interstitials are not fed through the immersion walker.
+
+Popup-only translation (textarea) does not consult this list.
+
 ### `cache.js`
 
 Two layers:
@@ -89,6 +99,13 @@ DEFAULT_SETTINGS = {
   enableTranslationMemory: true,
   fullPagePreserveOriginal: true,
   fullPageStreamRender: true,
+  immersionEnabled: true,
+  immersionTarget: "tmg",
+  immersionMaxLevel: 1,
+  immersionDensity: 3,
+  immersionDailyGoal: 5,
+  translateBlocklistEnabled: true,
+  translateBlockedHosts: [ /* built-in suffixes from site-blocklist.js */ ],
 };
 ```
 
@@ -138,7 +155,7 @@ The loader caches the result in memory to keep immersion startup snappy.
 
 ## Immersion mode pipeline
 
-1. On every page load, `content.js` calls `IMMERSION_BOOTSTRAP`.
+1. After the tab fires `window` **`load`** (document `readyState === "complete"`), `content.js` checks `shouldSkipImmersivePage` (blocklist + Cloudflare-style interstitials). If the URL is allowed, it calls `IMMERSION_BOOTSTRAP`.
 2. The service worker:
    - Checks `immersionEnabled` setting → returns `{ enabled: false }` early if off.
    - Loads `vocab.json` via `vocab-loader.js`, filters to entries that have the active target translation and are within the configured `immersionMaxLevel`.

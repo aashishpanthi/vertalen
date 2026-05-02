@@ -1,20 +1,3 @@
-/**
- * TMT API client.
- *
- *   POST https://tmt.ilprl.ku.edu.np/lang-translate
- *   Authorization: Bearer team_xxxxxxxxxxxxxxxx
- *
- * The endpoint always returns HTTP 200 on a successful translation;
- * failures surface either as non-200 status (auth/format) or as
- * a JSON body with message_type === "FAIL".
- *
- * This module is a thin wrapper that:
- *   - Validates inputs early so we never burn a token on a bad call
- *   - Normalizes errors into a single TMTError class
- *   - Honors AbortSignal for cancellation
- *   - Implements exponential backoff with jitter on 429 / 5xx
- */
-
 import { getLanguage } from "./languages.js";
 
 export const TMT_ENDPOINT = "https://tmt.ilprl.ku.edu.np/lang-translate";
@@ -78,9 +61,9 @@ function jitter(ms) {
 }
 
 export class TMTClient {
-  constructor({ apiKey, fetchImpl = fetch, maxRetries = 3 } = {}) {
+  constructor({ apiKey, fetchImpl, maxRetries = 3 } = {}) {
     this.apiKey = apiKey;
-    this.fetch = fetchImpl;
+    this.fetch = fetchImpl ? fetchImpl : (...args) => fetch(...args);
     this.maxRetries = maxRetries;
   }
 

@@ -1,6 +1,7 @@
 import { MSG } from "../lib/messages.js";
 import { Storage, SETTINGS_KEYS } from "../lib/storage.js";
 import { TMTClient } from "../lib/api.js";
+import { BUILTIN_BLOCKED_HOST_SUFFIXES } from "../lib/site-blocklist.js";
 
 const els = {
   apiKey: document.getElementById("apiKey"),
@@ -18,6 +19,10 @@ const els = {
   showFloatingButton: document.getElementById("showFloatingButton"),
   inlineTooltip: document.getElementById("inlineTooltip"),
   fullPagePreserveOriginal: document.getElementById("fullPagePreserveOriginal"),
+
+  translateBlocklistEnabled: document.getElementById("translateBlocklistEnabled"),
+  translateBlockedHosts: document.getElementById("translateBlockedHosts"),
+  blocklistRestore: document.getElementById("blocklistRestore"),
 
   rateLimitPerMinute: document.getElementById("rateLimitPerMinute"),
   rateValue: document.getElementById("rateValue"),
@@ -93,6 +98,13 @@ function applySettings(settings) {
   els.immersionDensity.value = settings.immersionDensity ?? 3;
   els.immersionDensityLabel.textContent = `${settings.immersionDensity ?? 3}%`;
   els.immersionDailyGoal.value = settings.immersionDailyGoal ?? 5;
+
+  els.translateBlocklistEnabled.checked = settings.translateBlocklistEnabled !== false;
+  const bh = settings.translateBlockedHosts;
+  els.translateBlockedHosts.value =
+    Array.isArray(bh) && bh.length > 0
+      ? bh.join("\n")
+      : BUILTIN_BLOCKED_HOST_SUFFIXES.join("\n");
 }
 
 function bindEvents() {
@@ -150,6 +162,24 @@ function bindEvents() {
   bindSettingChange(els.fullPagePreserveOriginal, (e) => ({
     fullPagePreserveOriginal: e.target.checked,
   }));
+  bindSettingChange(els.translateBlocklistEnabled, (e) => ({
+    translateBlocklistEnabled: e.target.checked,
+  }));
+
+  const saveBlocklistHosts = async () => {
+    const lines = parseBlocklistLines(els.translateBlockedHosts.value);
+    await sendMessage({ type: MSG.SET_SETTINGS, patch: { translateBlockedHosts: lines } });
+  };
+
+  els.translateBlockedHosts.addEventListener("blur", saveBlocklistHosts);
+
+  els.blocklistRestore.addEventListener("click", async () => {
+    const lines = [...BUILTIN_BLOCKED_HOST_SUFFIXES];
+    els.translateBlockedHosts.value = lines.join("\n");
+    await sendMessage({ type: MSG.SET_SETTINGS, patch: { translateBlockedHosts: lines } });
+    setStatus("Restored default blocked hosts.", "ok");
+  });
+
   bindSettingChange(els.enableTranslationMemory, (e) => ({
     enableTranslationMemory: e.target.checked,
   }));
@@ -210,6 +240,13 @@ function bindEvents() {
       updateHistory(changes.history.newValue || []);
     }
   });
+}
+
+function parseBlocklistLines(text) {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.split("#")[0].trim())
+    .filter(Boolean);
 }
 
 function bindSettingChange(el, mapper) {

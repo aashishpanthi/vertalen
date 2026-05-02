@@ -1,22 +1,16 @@
-/*
- * vertalen — onboarding (welcome) styles
- *
- * Big-feeling first-run page that adapts to every viewport size.
- * Uses fluid typography (clamp), responsive grid (auto-fit /
- * minmax), and gracefully collapses to a single column below
- * 720px so the screen never feels cramped.
- */
-
 :root {
-  --bg: #fefdfb;
+  --bg: #fffbfb;
   --surface: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --accent: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.1);
-  --accent-strong: #115e59;
-  --border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
+  --text: #1a1f2e;
+  --muted: #6b7280;
+  --accent: #dc143c;
+  --accent-soft: rgba(220, 20, 60, 0.1);
+  --accent-strong: #9f0e2c;
+  --secondary: #003893;
+  --secondary-soft: rgba(0, 56, 147, 0.1);
+  --secondary-strong: #002766;
+  --border: rgba(26, 31, 46, 0.08);
+  --shadow: 0 16px 48px rgba(220, 20, 60, 0.08);
   --radius: 18px;
   --radius-sm: 10px;
   color-scheme: light dark;
@@ -24,14 +18,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #050b1a;
-    --surface: #0f172a;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #2dd4bf;
-    --accent-soft: rgba(45, 212, 191, 0.14);
-    --accent-strong: #5eead4;
-    --border: rgba(148, 163, 184, 0.16);
+    --bg: #15060c;
+    --surface: #28121a;
+    --text: #f5e6e8;
+    --muted: #b09098;
+    --accent: #ff5c7a;
+    --accent-soft: rgba(255, 92, 122, 0.16);
+    --accent-strong: #ff8aa1;
+    --secondary: #6a8eff;
+    --secondary-soft: rgba(106, 142, 255, 0.16);
+    --secondary-strong: #9ab0ff;
+    --border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -45,7 +42,7 @@ body {
   padding: 0;
   background:
     radial-gradient(circle at 0% 0%, var(--accent-soft), transparent 45%),
-    radial-gradient(circle at 100% 100%, var(--accent-soft), transparent 45%),
+    radial-gradient(circle at 100% 100%, var(--secondary-soft), transparent 42%),
     var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -74,7 +71,16 @@ body {
   width: clamp(3.5rem, 6vw + 1rem, 5rem);
   height: clamp(3.5rem, 6vw + 1rem, 5rem);
   border-radius: 22%;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow), 0 0 0 3px var(--secondary);
+}
+
+.hero__eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: clamp(0.78rem, 0.4vw + 0.6rem, 0.92rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--secondary-strong);
+  font-weight: 700;
 }
 
 .hero__title {
@@ -92,7 +98,7 @@ body {
 }
 
 .hero__sub strong {
-  color: var(--accent-strong);
+  color: var(--secondary-strong);
   font-weight: 700;
 }
 
@@ -141,6 +147,22 @@ body {
 .step__body {
   display: grid;
   gap: 0.8rem;
+}
+
+.step__note {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  font-size: clamp(0.86rem, 0.45vw + 0.65rem, 0.94rem);
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--secondary-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--secondary);
+}
+
+.step__note strong {
+  color: var(--secondary-strong);
 }
 
 .key-form {

@@ -12,7 +12,7 @@
         <img src="../icons/icon48.png" alt="" />
         <div>
           <h1>vertalen</h1>
-          <p>Settings &amp; preferences</p>
+          <p class="topbar__tagline">Trilingual translation · Settings</p>
         </div>
       </div>
       <div class="topbar__status" id="status" aria-live="polite"></div>
@@ -23,6 +23,7 @@
         <a href="#api">API key</a>
         <a href="#defaults">Defaults</a>
         <a href="#behavior">Behavior</a>
+        <a href="#blocklist">Blocked sites</a>
         <a href="#immersion">Immersion / Learn</a>
         <a href="#performance">Performance</a>
         <a href="#memory">Translation memory</a>
@@ -36,7 +37,9 @@
             <h2>API key</h2>
             <p>
               Your TMT team token is stored locally in your browser profile and
-              is sent only to <code>tmt.ilprl.ku.edu.np</code>.
+              is sent only to <code>tmt.ilprl.ku.edu.np</code>. It is required
+              for live translation. <strong>Immersion / Learn</strong> works
+              offline from bundled vocabulary without a key.
             </p>
           </header>
           <form class="api-form" id="apiForm">
@@ -60,7 +63,7 @@
                 </button>
               </div>
               <span class="field__hint">
-                Get your token from the registration confirmation email.
+                Use the bearer token issued for your TMT API access.
               </span>
             </label>
             <div class="api-form__actions">
@@ -126,6 +129,53 @@
               <span class="toggle__title">Preserve originals on full-page translate</span>
               <span class="toggle__hint">Hover translated nodes to see the original text.</span>
             </label>
+          </div>
+        </article>
+
+        <article id="blocklist" class="card">
+          <header>
+            <h2>Blocked sites</h2>
+            <p>
+              Full-page translate, reader mode, immersion vocabulary, and
+              the on-page selection tooltip are skipped on these hosts so
+              search results, social feeds, and bot-check pages stay readable.
+              <strong>Google Search</strong> (<code>/search</code> on any
+              <code>google.*</code> host) is always treated as a search page.
+              Your popup translator is not affected.
+            </p>
+          </header>
+          <div class="toggles">
+            <label class="toggle">
+              <input type="checkbox" id="translateBlocklistEnabled" />
+              <span class="toggle__title">Use site blocklist</span>
+              <span class="toggle__hint"
+                >Turn off only if you need to debug or override everything (not
+                recommended).</span
+              >
+            </label>
+          </div>
+          <label class="field field--block">
+            <span class="field__label"
+              >Blocked host suffixes (one per line)</span
+            >
+            <textarea
+              id="translateBlockedHosts"
+              class="blocklist-area"
+              rows="14"
+              spellcheck="false"
+              placeholder="facebook.com"
+            ></textarea>
+            <span class="field__hint"
+              >Matches the hostname and all subdomains (e.g.
+              <code>m.facebook.com</code> matches <code>facebook.com</code>).
+              Lines starting with <code>#</code> are comments. Save by leaving
+              the field (blur) or click Restore defaults.</span
+            >
+          </label>
+          <div class="blocklist-actions">
+            <button type="button" class="btn btn--ghost" id="blocklistRestore">
+              Restore default list
+            </button>
           </div>
         </article>
 
@@ -294,9 +344,9 @@
             <h2>About</h2>
           </header>
           <p>
-            <strong>vertalen</strong> is an open-source Chrome extension built
-            for the Google TMT Hackathon 2026, powered by the TMT translation
-            system at Kathmandu University.
+            <strong>vertalen</strong> is an open-source Chrome extension for
+            translating pages between English, Nepali, and Tamang, with an
+            optional learn-on-the-go mode.
           </p>
           <ul class="about-list">
             <li><strong>Version:</strong> <span id="version">1.0.0</span></li>

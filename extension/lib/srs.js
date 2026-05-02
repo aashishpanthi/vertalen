@@ -1,25 +1,3 @@
-/**
- * vertalen — spaced-repetition + progress tracking.
- *
- * A small SuperMemo-2-inspired scheduler tuned for an "ambient
- * immersion" use case where most reviews are passive (the user just
- * sees a word in context) rather than active (flashcard quiz). The
- * passive event nudges confidence very slightly; the active answer
- * adjusts it more, the way an SRS would.
- *
- * Confidence is bounded to [0, 5]:
- *   0 — never seen
- *   1 — encountered, no commitment
- *   2 — recognized once
- *   3 — recognized multiple times in context
- *   4 — actively recalled at least once in a quiz
- *   5 — mastered (drops out of rotation)
- *
- * The "due" time tells the immersion picker whether this word is a
- * good candidate to surface again. A mastered word with a due time
- * far in the future is rarely chosen.
- */
-
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 const INTERVALS = [
@@ -83,12 +61,6 @@ function rollDaily(state, now) {
   }
 }
 
-/**
- * @param {object} state
- * @param {string} word - lowercase English headword
- * @param {"shown"|"hovered"|"correct"|"again"|"skip"} action
- * @param {number} now
- */
 export function record(state, word, action, now = Date.now()) {
   rollDaily(state, now);
   const card = ensureCard(state, word);
@@ -153,11 +125,6 @@ export function summary(state, now = Date.now()) {
   };
 }
 
-/**
- * Pick which entries to surface in immersion. Newer words are
- * favored; mastered words are skipped most of the time. Returns a
- * shuffled list capped at `limit`.
- */
 export function pickCandidates(state, vocab, { limit = 80, now = Date.now() } = {}) {
   const scored = vocab.map((entry) => {
     const card = state.cards[entry.en.toLowerCase()];
@@ -176,11 +143,6 @@ export function pickCandidates(state, vocab, { limit = 80, now = Date.now() } = 
   return scored.slice(0, limit).map((s) => s.entry);
 }
 
-/**
- * Pick a single word for a quiz round. Prefers words the user has
- * encountered passively (confidence 1–4) so the quiz feels familiar
- * rather than random.
- */
 export function pickQuizWord(state, vocab, now = Date.now()) {
   const candidates = vocab.filter((entry) => {
     const c = state.cards[entry.en.toLowerCase()];

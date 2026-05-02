@@ -1,6 +1,8 @@
 import { MSG } from "../lib/messages.js";
 import { LANGUAGE_LIST, getLanguage, isPairSupported } from "../lib/languages.js";
 import { detect } from "../lib/lang-detect.js";
+import { isUrlBlockedForVertalen } from "../lib/site-blocklist.js";
+import { Storage } from "../lib/storage.js";
 
 const els = {
   srcLang: document.getElementById("srcLang"),
@@ -25,8 +27,9 @@ const els = {
   tabLearn: document.getElementById("tabLearn"),
   paneTranslate: document.getElementById("paneTranslate"),
   paneLearn: document.getElementById("paneLearn"),
-  immersionPrompt: document.getElementById("immersionPrompt"),
-  enableImmersion: document.getElementById("enableImmersion"),
+  immersionToggleCard: document.getElementById("immersionToggleCard"),
+  immersionToggleDesc: document.getElementById("immersionToggleDesc"),
+  immersionSwitch: document.getElementById("immersionSwitch"),
   streakCount: document.getElementById("streakCount"),
   learnedToday: document.getElementById("learnedToday"),
   learnMastered: document.getElementById("learnMastered"),
@@ -46,6 +49,9 @@ const state = {
   loading: false,
 };
 
+const BLOCKED_TAB =
+  "This tab is on vertalen's blocklist (search engines, social sites, or your custom list). Open Settings → Blocked sites to change it.";
+
 init();
 
 async function init() {
@@ -60,11 +66,13 @@ async function loadSettings() {
   els.srcLang.value = state.settings.defaultSrc || "eng";
   els.tgtLang.value = state.settings.defaultTgt || "nep";
   guardPair();
+  syncImmersionToggleUI(Boolean(state.settings.immersionEnabled));
+  if (!els.paneLearn.hidden) refreshLearnPane();
 }
 
 async function checkApiKey() {
-  const resp = await sendMessage({ type: MSG.GET_API_STATUS });
-  const ok = resp?.hasKey;
+  const apiKey = await Storage.getApiKey();
+  const ok = Boolean(apiKey);
   els.warningKey.hidden = ok;
   els.translate.disabled = !ok;
   els.translatePage.disabled = !ok;
@@ -96,10 +104,16 @@ function bindEvents() {
 
   els.tabTranslate.addEventListener("click", () => switchTab("translate"));
   els.tabLearn.addEventListener("click", () => switchTab("learn"));
-  els.enableImmersion.addEventListener("click", enableImmersion);
+  els.immersionSwitch.addEventListener("change", onImmersionToggle);
   els.quizSkip.addEventListener("click", () => loadQuiz());
   els.quizNew.addEventListener("click", () => loadQuiz());
   els.learnSettings.addEventListener("click", openOptions);
+
+  chrome.storage?.onChanged?.addListener((changes, area) => {
+    if (area !== "local") return;
+    if (changes.apiKey) checkApiKey();
+    if (changes.settings) loadSettings();
+  });
 }
 
 function switchTab(name) {
@@ -116,22 +130,30 @@ function switchTab(name) {
 async function refreshLearnPane() {
   const { settings } = state;
   const enabled = Boolean(settings?.immersionEnabled);
-  els.immersionPrompt.hidden = enabled;
+  syncImmersionToggleUI(enabled);
+
+  const target = settings?.immersionTarget || "tmg";
+  els.quizLang.textContent = target === "tmg" ? "Tamang" : "Nepali";
+  els.dailyGoal.textContent = String(settings?.immersionDailyGoal || 5);
+
   if (!enabled) {
-    els.quizBody.innerHTML = '<p class="quiz__hint">Turn on immersion to start learning.</p>';
+    els.streakCount.textContent = "0";
+    els.learnedToday.textContent = "0";
+    els.learnMastered.textContent = "0";
+    els.dailyFill.style.width = "0%";
+    els.dailyCaption.textContent =
+      "Flip the switch above to turn immersion on. We'll start surfacing words as you browse.";
+    els.quizBody.innerHTML =
+      '<p class="quiz__hint">Turn on immersion above to unlock the quiz.</p>';
     return;
   }
-
-  const target = settings.immersionTarget || "tmg";
-  els.quizLang.textContent = target === "tmg" ? "Tamang" : "Nepali";
-  els.dailyGoal.textContent = String(settings.immersionDailyGoal || 5);
 
   const stats = await sendMessage({ type: MSG.IMMERSION_STATS });
   const summary = stats?.summary || {};
   els.streakCount.textContent = String(summary.streak || 0);
   els.learnedToday.textContent = String(summary.learnedToday || 0);
   els.learnMastered.textContent = String(summary.mastered || 0);
-  const goal = Math.max(1, settings.immersionDailyGoal || 5);
+  const goal = Math.max(1, settings?.immersionDailyGoal || 5);
   const pct = Math.min(100, Math.round(((summary.learnedToday || 0) / goal) * 100));
   els.dailyFill.style.width = `${pct}%`;
   els.dailyCaption.textContent =
@@ -142,12 +164,22 @@ async function refreshLearnPane() {
   loadQuiz();
 }
 
-async function enableImmersion() {
-  await sendMessage({
+function syncImmersionToggleUI(enabled) {
+  els.immersionSwitch.checked = enabled;
+  els.immersionToggleCard.dataset.active = String(enabled);
+  els.immersionToggleDesc.textContent = enabled
+    ? "On — random English words on pages will appear in your target language."
+    : "Off — pages stay in their original language.";
+}
+
+async function onImmersionToggle(e) {
+  const enabled = Boolean(e.target.checked);
+  syncImmersionToggleUI(enabled);
+  const resp = await sendMessage({
     type: MSG.SET_SETTINGS,
-    patch: { immersionEnabled: true },
+    patch: { immersionEnabled: enabled },
   });
-  await loadSettings();
+  if (resp?.settings) state.settings = resp.settings;
   refreshLearnPane();
 }
 
@@ -287,6 +319,10 @@ async function runTranslate() {
 async function runPageTranslate() {
   const tab = await getActiveTab();
   if (!tab?.id) return;
+  if (tab.url && isUrlBlockedForVertalen(tab.url, state.settings || {})) {
+    alert(BLOCKED_TAB);
+    return;
+  }
   await sendMessage({
     type: MSG.TRANSLATE_PAGE,
     tabId: tab.id,
@@ -299,6 +335,10 @@ async function runPageTranslate() {
 async function runReader() {
   const tab = await getActiveTab();
   if (!tab?.id) return;
+  if (tab.url && isUrlBlockedForVertalen(tab.url, state.settings || {})) {
+    alert(BLOCKED_TAB);
+    return;
+  }
   await sendMessage({ type: MSG.OPEN_READER, tabId: tab.id });
   window.close();
 }

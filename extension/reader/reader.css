@@ -1,22 +1,16 @@
-/*
- * vertalen — reader mode (side-by-side)
- *
- * The reader is a full-page experience that opens in a new tab.
- * Layout: two equal columns above 768px, stacked vertically below
- * that, controlled by CSS Grid with `auto-fit` and `minmax`. Every
- * dimension is fluid so long-form articles read well at any size.
- */
-
 :root {
-  --bg: #fefdfb;
+  --bg: #fffbfb;
   --surface: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --accent: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.1);
-  --accent-strong: #115e59;
-  --border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  --text: #1a1f2e;
+  --muted: #6b7280;
+  --accent: #dc143c;
+  --accent-soft: rgba(220, 20, 60, 0.1);
+  --accent-strong: #9f0e2c;
+  --secondary: #003893;
+  --secondary-soft: rgba(0, 56, 147, 0.1);
+  --secondary-strong: #002766;
+  --border: rgba(26, 31, 46, 0.08);
+  --shadow: 0 12px 32px rgba(220, 20, 60, 0.06);
   --radius: 14px;
   --radius-sm: 10px;
   color-scheme: light dark;
@@ -24,14 +18,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #050b1a;
-    --surface: #0f172a;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #2dd4bf;
-    --accent-soft: rgba(45, 212, 191, 0.14);
-    --accent-strong: #5eead4;
-    --border: rgba(148, 163, 184, 0.16);
+    --bg: #15060c;
+    --surface: #28121a;
+    --text: #f5e6e8;
+    --muted: #b09098;
+    --accent: #ff5c7a;
+    --accent-soft: rgba(255, 92, 122, 0.16);
+    --accent-strong: #ff8aa1;
+    --secondary: #6a8eff;
+    --secondary-soft: rgba(106, 142, 255, 0.16);
+    --secondary-strong: #9ab0ff;
+    --border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -57,7 +54,8 @@ body {
   top: 0;
   z-index: 5;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 3px solid var(--secondary);
+  box-shadow: 0 1px 0 rgba(0, 56, 147, 0.1);
   padding: clamp(0.6rem, 1.5vw, 1rem) clamp(1rem, 4vw, 2.5rem);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -242,6 +240,19 @@ body {
   font-weight: 700;
   color: var(--accent-strong);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.column--translation {
+  border-color: rgba(0, 56, 147, 0.22);
+  box-shadow: var(--shadow), 0 0 0 1px var(--secondary-soft);
+}
+
+.column--translation .column__header {
+  border-bottom: 2px solid var(--secondary);
+}
+
+.column--translation .column__header h2 {
+  color: var(--secondary-strong);
 }
 
 .column__header span {

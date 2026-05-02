@@ -1,23 +1,23 @@
 # vertalen — Demo Script
 
-A 5–6 minute walk-through that exercises every feature mentioned in the rubric. Use this as your video script or hand it to evaluators.
+A 5–6 minute walk-through of the main features. Use it as a video script or rehearsal checklist.
 
-> **Lead with the story.** The first 30 seconds of your video should *not* show a feature — they should explain why this exists. See the opener below.
+> **Lead with the story.** The first 30 seconds can explain *why* Tamang-focused tooling matters before diving into UI.
 
 ## 0. Setup (one-time, ~30 s)
 
 1. Open `chrome://extensions`.
 2. Toggle **Developer mode** on.
 3. Click **Load unpacked** and select the `extension/` folder.
-4. The vertalen welcome page opens automatically.
-5. Paste your TMT team token (`team_xxxxxxxxxxxxxxxx`) and click **Save key**.
+4. The welcome page may open on first install.
+5. Paste your TMT API token and click **Save key**.
 6. Pin the vertalen icon to the toolbar.
 
 ## 1. Opener (~30 s, voiceover)
 
 > "Tamang has 1.3 million speakers, but you've probably never seen it on the web. UNESCO lists it as vulnerable. Most translation tools take you *away from* Tamang — they help you read English instead. **vertalen does the opposite**: it helps you read English while quietly teaching you Tamang along the way."
 
-Now show the welcome page; mention the trinity logo (Latin V + Devanagari व).
+Now show the welcome page; mention the extension icon (Latin **V** + Devanagari **व**).
 
 ## 2. Sample translation from onboarding (~30 s)
 
@@ -60,7 +60,7 @@ This proves the API key works end-to-end.
 
 ## 7. **Immersion mode — the differentiator (~90 s)**
 
-This is the section that wins the rubric. Take your time here.
+This is the main differentiator — take your time here.
 
 - Open the popup. Switch to the **Learn** tab.
 - If immersion is off: click **Turn on**.
@@ -92,8 +92,8 @@ This is the section that wins the rubric. Take your time here.
 
 ## 10. Closing shot (~15 s)
 
-- Show the GitHub repo, LICENSE, and the GitHub Release with `vertalen-1.0.0.zip`.
-- "Built in one weekend for the Google TMT Hackathon 2026, by Aashish Panthi. Open-source under MIT, ready to extend."
+- Show the GitHub repo, LICENSE, and release zip if applicable.
+- One line: open-source MIT, built for English / Nepali / Tamang with the public TMT API.
 
 ## Talking points to weave in
 
@@ -103,4 +103,4 @@ This is the section that wins the rubric. Take your time here.
 - Sentence splitter handles Devanagari `।` and abbreviation guards.
 - Immersion's vocabulary is **pre-translated and shipped offline** so it makes zero API calls while you browse.
 - Spaced-repetition algorithm based on SuperMemo-2 with confidence in `[0, 5]`.
-- Built specifically for the trilingual mission of the TMT project — not adapted from a general-purpose translator.
+- Trilingual English / Nepali / Tamang via the TMT API — not a generic one-language add-on.

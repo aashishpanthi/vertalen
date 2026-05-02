@@ -1,14 +1,3 @@
-/**
- * Lightweight language detection for the three TMT languages.
- *
- * Approach: Devanagari Unicode block (U+0900 – U+097F) covers both
- * Nepali and Tamang. Latin block covers English. We can't reliably
- * tell Nepali from Tamang by glyphs alone (both use Devanagari),
- * so we return "deva" when the dominant script is Devanagari and
- * the caller decides between Nepali and Tamang based on user
- * preference / target language.
- */
-
 const RE_DEVANAGARI = /[\u0900-\u097F]/;
 const RE_LATIN_LETTER = /[A-Za-z]/;
 
@@ -24,13 +13,6 @@ export function dominantScript(text) {
   return deva >= latin ? "deva" : "latin";
 }
 
-/**
- * Best-effort source language guess.
- *
- * @param {string} text The text to analyze
- * @param {string} hint Optional preferred Devanagari language: "nep" or "tmg"
- * @returns {"eng"|"nep"|"tmg"|null}
- */
 export function detect(text, hint = "nep") {
   const script = dominantScript(text);
   if (script === "latin") return "eng";

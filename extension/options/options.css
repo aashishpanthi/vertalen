@@ -1,23 +1,17 @@
-/*
- * vertalen — options page styles
- *
- * Layout: a fluid two-column grid (sidenav + content) that collapses
- * gracefully to a single column on narrow viewports. All sizing uses
- * clamp / rem / fr so the page scales across screen sizes per the
- * project rule.
- */
-
 :root {
-  --bg: #f8fafc;
+  --bg: #fdf6f6;
   --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --text: #0f172a;
-  --muted: #64748b;
-  --accent: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.1);
-  --accent-strong: #115e59;
-  --border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  --surface-2: #faeaec;
+  --text: #1a1f2e;
+  --muted: #6b7280;
+  --accent: #dc143c;
+  --accent-soft: rgba(220, 20, 60, 0.1);
+  --accent-strong: #9f0e2c;
+  --secondary: #003893;
+  --secondary-soft: rgba(0, 56, 147, 0.1);
+  --secondary-strong: #002766;
+  --border: rgba(26, 31, 46, 0.08);
+  --shadow: 0 12px 32px rgba(220, 20, 60, 0.06);
   --error: #b91c1c;
   --success: #047857;
   --radius: 14px;
@@ -27,15 +21,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #050b1a;
-    --surface: #0f172a;
-    --surface-2: #1e293b;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #2dd4bf;
-    --accent-soft: rgba(45, 212, 191, 0.14);
-    --accent-strong: #5eead4;
-    --border: rgba(148, 163, 184, 0.16);
+    --bg: #15060c;
+    --surface: #28121a;
+    --surface-2: #3a1c25;
+    --text: #f5e6e8;
+    --muted: #b09098;
+    --accent: #ff5c7a;
+    --accent-soft: rgba(255, 92, 122, 0.16);
+    --accent-strong: #ff8aa1;
+    --secondary: #6a8eff;
+    --secondary-soft: rgba(106, 142, 255, 0.16);
+    --secondary-strong: #9ab0ff;
+    --border: rgba(255, 255, 255, 0.1);
     --shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   }
 }
@@ -65,7 +62,8 @@ body {
   justify-content: space-between;
   padding: clamp(0.8rem, 1.5vw + 0.5rem, 1.2rem) clamp(1rem, 4vw, 2.5rem);
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 3px solid var(--secondary);
+  box-shadow: 0 1px 0 rgba(0, 56, 147, 0.12);
   gap: 1rem;
 }
 
@@ -79,6 +77,7 @@ body {
   width: clamp(2rem, 2.5vw + 1rem, 2.5rem);
   height: clamp(2rem, 2.5vw + 1rem, 2.5rem);
   border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--secondary);
 }
 
 .topbar h1 {
@@ -88,10 +87,12 @@ body {
   letter-spacing: -0.01em;
 }
 
-.topbar p {
+.topbar__tagline {
   margin: 0;
   font-size: clamp(0.78rem, 0.4vw + 0.6rem, 0.9rem);
-  color: var(--muted);
+  color: var(--secondary-strong);
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 .topbar__status {
@@ -407,4 +408,38 @@ code {
   padding: 0.1rem 0.4rem;
   border-radius: 6px;
   font-size: 0.88em;
+}
+
+.field--block {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.blocklist-area {
+  width: 100%;
+  min-height: 12rem;
+  box-sizing: border-box;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+  font-size: clamp(0.78rem, 0.35vw + 0.65rem, 0.88rem);
+  line-height: 1.45;
+  resize: vertical;
+  field-sizing: content;
+}
+
+.blocklist-area:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 1px;
+}
+
+.blocklist-actions {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }

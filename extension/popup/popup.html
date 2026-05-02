@@ -13,7 +13,7 @@
           <img src="../icons/icon48.png" alt="" class="brand__logo" />
           <div class="brand__text">
             <h1 class="brand__name">vertalen</h1>
-            <p class="brand__tag">Trilingual translation</p>
+            <p class="brand__tag">English · Nepali · Tamang</p>
           </div>
         </div>
         <button
@@ -38,8 +38,11 @@
         role="alert"
         aria-live="polite"
       >
-        <strong>API key required.</strong>
-        <span>vertalen needs your TMT team token to translate.</span>
+        <strong>TMT token needed for translation.</strong>
+        <span
+          >Add your TMT API token to translate selections and pages. Learn /
+          immersion uses built-in vocabulary and works without a token.</span
+        >
         <button class="warning__btn" id="warningOpenOptions">Add key</button>
       </section>
 
@@ -50,6 +53,7 @@
           role="tab"
           aria-selected="true"
           aria-controls="paneTranslate"
+          title="On-demand translation. Pick text or a page and convert it now. Needs your TMT token."
         >
           Translate
         </button>
@@ -59,12 +63,17 @@
           role="tab"
           aria-selected="false"
           aria-controls="paneLearn"
+          title="Ambient learning while you browse. Random English words become Nepali or Tamang. No token needed."
         >
           Learn
         </button>
       </nav>
 
       <div id="paneTranslate" role="tabpanel" aria-labelledby="tabTranslate" class="pane">
+      <p class="pane__intro">
+        On-demand translation. Convert selected text or a whole page on
+        request. <strong>Uses your TMT API token.</strong>
+      </p>
       <section class="lang-row" aria-label="Language picker">
         <label class="lang">
           <span class="lang__label">From</span>
@@ -156,15 +165,24 @@
       </div><!-- /paneTranslate -->
 
       <div id="paneLearn" role="tabpanel" aria-labelledby="tabLearn" class="pane" hidden>
-        <section
-          id="immersionPrompt"
-          class="warning"
-          hidden
-          role="alert"
-        >
-          <strong>Immersion mode is off.</strong>
-          <span>Turn it on to learn Tamang or Nepali while you browse.</span>
-          <button class="warning__btn" id="enableImmersion">Turn on</button>
+        <p class="pane__intro">
+          Learn Nepali or Tamang while you read the web. Random English words
+          turn into your target language. <strong>No API token needed</strong> —
+          uses built-in vocabulary.
+        </p>
+
+        <section class="toggle-card" id="immersionToggleCard">
+          <div class="toggle-card__body">
+            <strong class="toggle-card__title">Immersion mode</strong>
+            <span class="toggle-card__desc" id="immersionToggleDesc">
+              On — words are being replaced as you browse.
+            </span>
+          </div>
+          <label class="switch" title="Toggle immersion mode">
+            <input type="checkbox" id="immersionSwitch" />
+            <span class="switch__slider" aria-hidden="true"></span>
+            <span class="switch__sr">Toggle immersion mode</span>
+          </label>
         </section>
 
         <section class="learn-stats">

@@ -1,15 +1,3 @@
-/**
- * Two-layer translation cache.
- *
- *   1. In-memory LRU keyed by (text, src, tgt). Lives only as long as
- *      the service worker is alive.
- *   2. Persistent translation memory (TM) in chrome.storage.local.
- *      Survives across browser restarts and powers the export feature.
- *
- * The service worker reads the LRU first, then the TM, then makes a
- * network call. On success we write through to both layers.
- */
-
 import { Storage } from "./storage.js";
 import { makeTMKey } from "./api.js";
 

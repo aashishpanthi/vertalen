@@ -1,11 +1,3 @@
-/**
- * Centralized message-type constants for runtime communication
- * between the service worker, content scripts, and extension pages.
- *
- * Using string constants here (instead of enums) keeps the lib usable
- * from both ES module and content-script contexts.
- */
-
 export const MSG = Object.freeze({
   TRANSLATE_TEXT: "vertalen/translate_text",
   TRANSLATE_BATCH: "vertalen/translate_batch",

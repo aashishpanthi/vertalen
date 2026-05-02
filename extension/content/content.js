@@ -1,21 +1,147 @@
-/**
- * vertalen — content script
- *
- * Runs in the isolated world on every web page (except chrome://, about://,
- * and a few file types we exclude in the manifest). Responsibilities:
- *
- *   - Detect text selection and show a non-destructive floating button.
- *   - Render translation tooltips and the full-page progress badge.
- *   - Forward translation requests to the service worker.
- *   - Listen for shortcut-driven translation requests.
- *
- * IMPORTANT: This file is not loaded as a module (manifest constraint),
- * so we use an IIFE and avoid ES import/export here.
- */
-
 (() => {
   if (window.__vertalenInjected) return;
   window.__vertalenInjected = true;
+
+  const BUILTIN_BLOCKED_HOST_SUFFIXES = [
+    "facebook.com",
+    "fb.com",
+    "instagram.com",
+    "twitter.com",
+    "x.com",
+    "linkedin.com",
+    "licdn.com",
+    "redd.it",
+    "tiktok.com",
+    "pinterest.com",
+    "pinimg.com",
+    "youtube.com",
+    "youtu.be",
+    "googlevideo.com",
+    "snapchat.com",
+    "discord.com",
+    "discordapp.com",
+    "discord.gg",
+    "whatsapp.com",
+    "web.whatsapp.com",
+    "t.me",
+    "telegram.org",
+    "bsky.app",
+    "tumblr.com",
+    "challenges.cloudflare.com",
+    "captcha.website",
+  ];
+
+  const GOOGLE_HOST_RE = /^google\.[a-z0-9.]+$/i;
+
+  function normalizeHost(hostname) {
+    return String(hostname || "")
+      .replace(/^www\./i, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  function isGoogleSearchUrl(u) {
+    if (!GOOGLE_HOST_RE.test(normalizeHost(u.hostname))) return false;
+    const path = u.pathname || "/";
+    return path === "/search" || path.startsWith("/search?");
+  }
+
+  function isBingSearchUrl(u) {
+    const h = normalizeHost(u.hostname);
+    if (h !== "bing.com" && !h.endsWith(".bing.com")) return false;
+    const path = u.pathname || "/";
+    return path === "/search" || path.startsWith("/search?");
+  }
+
+  function isYahooSearchUrl(u) {
+    const h = normalizeHost(u.hostname);
+    if (h === "search.yahoo.com" || h.endsWith(".search.yahoo.com")) return true;
+    if (h === "yahoo.com" || h.endsWith(".yahoo.com")) {
+      const path = u.pathname || "/";
+      return path.startsWith("/search");
+    }
+    return false;
+  }
+
+  function isDuckDuckGoHost(u) {
+    const h = normalizeHost(u.hostname);
+    return h === "duckduckgo.com" || h.endsWith(".duckduckgo.com");
+  }
+
+  function hostMatchesSuffix(hostname, suffix) {
+    const h = normalizeHost(hostname);
+    const s = normalizeHost(suffix);
+    if (!s) return false;
+    return h === s || h.endsWith(`.${s}`);
+  }
+
+  function effectiveBlockedSuffixes(settings) {
+    if (!settings?.translateBlocklistEnabled) return [];
+    const raw = settings.translateBlockedHosts;
+    if (!Array.isArray(raw) || raw.length === 0) {
+      return [...BUILTIN_BLOCKED_HOST_SUFFIXES];
+    }
+    return raw
+      .map((s) => normalizeHost(String(s).split("#")[0].trim()))
+      .filter(Boolean);
+  }
+
+  function isHostOnBlocklist(hostname, settings) {
+    if (!settings?.translateBlocklistEnabled) return false;
+    for (const suffix of effectiveBlockedSuffixes(settings)) {
+      if (hostMatchesSuffix(hostname, suffix)) return true;
+    }
+    return false;
+  }
+
+  function isUrlBlockedForVertalen(url, settings) {
+    if (!url || !settings?.translateBlocklistEnabled) return false;
+    try {
+      const u = new URL(url);
+      if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+      if (isGoogleSearchUrl(u)) return true;
+      if (isBingSearchUrl(u)) return true;
+      if (isYahooSearchUrl(u)) return true;
+      if (isDuckDuckGoHost(u)) return true;
+      if (isHostOnBlocklist(u.hostname, settings)) return true;
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  function isBotOrChallengeDocument(doc) {
+    if (!doc || !doc.documentElement) return false;
+    const title = (doc.title || "").toLowerCase();
+    if (
+      /just a moment|attention required|checking your browser|verifying you are human|enable javascript and cookies|one more step|ddos-guard|ddos protection|security check|ray id/i.test(
+        title,
+      )
+    ) {
+      return true;
+    }
+    if (
+      doc.querySelector(
+        "#cf-challenge-running, #challenge-stage, #challenge-form, .cf-browser-verification, .cf-im-under-attack, .RayID, .ray-id, iframe[src*='challenges.cloudflare.com'], iframe[src*='/cdn-cgi/challenge-platform/']",
+      )
+    ) {
+      return true;
+    }
+    const html = doc.documentElement;
+    if (
+      html.classList.contains("no-js") &&
+      (doc.body?.innerText || "").toLowerCase().includes("challenge")
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function shouldSkipImmersivePage(doc, loc, settings) {
+    if (isBotOrChallengeDocument(doc)) return true;
+    if (isUrlBlockedForVertalen(loc.href, settings)) return true;
+    return false;
+  }
 
   const MSG = {
     TRANSLATE_TEXT: "vertalen/translate_text",
@@ -28,6 +154,415 @@
   const IMMERSION_ATTR = "data-vertalen-imm";
   const IMMERSION_PROCESSED = "data-vertalen-imm-scanned";
 
+  const CRITICAL_CSS = `
+:host { all: initial; }
+.vertalen-floating,
+.vertalen-card,
+.vertalen-progress,
+.vertalen-imm-pop {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1a1f2e;
+  -webkit-font-smoothing: antialiased;
+}
+.vertalen-floating { display: inline-flex; }
+.vertalen-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  margin: 0;
+  border: none;
+  border-radius: 10px;
+  background: #dc143c;
+  color: #ffffff;
+  font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(220, 20, 60, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+.vertalen-fab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 38px rgba(220, 20, 60, 0.4);
+}
+.vertalen-fab__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.vertalen-card {
+  width: clamp(240px, 28vw, 380px);
+  max-width: calc(100vw - 24px);
+  background: #ffffff !important;
+  color: #1a1f2e !important;
+  border-radius: 14px;
+  border: 1px solid rgba(26, 31, 46, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 16px 40px rgba(220, 20, 60, 0.18);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+.vertalen-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: rgba(220, 20, 60, 0.1);
+  border-bottom: 1px solid rgba(26, 31, 46, 0.08);
+}
+.vertalen-card__pair {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dc143c;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vertalen-card__close {
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+.vertalen-card__close:hover {
+  background: rgba(26, 31, 46, 0.08);
+  color: #1a1f2e;
+}
+.vertalen-card__body {
+  padding: 0.85rem 0.95rem;
+  display: grid;
+  gap: 0.7rem;
+  background: #ffffff;
+}
+.vertalen-card__translated {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.45;
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1a1f2e;
+}
+.vertalen-card--error .vertalen-card__translated {
+  color: #b91c1c;
+}
+.vertalen-card__detail {
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+.vertalen-card__detail summary {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  font-weight: 600;
+}
+.vertalen-card__detail summary::-webkit-details-marker { display: none; }
+.vertalen-card__original {
+  margin-top: 0.45rem;
+  padding: 0.55rem 0.65rem;
+  background: rgba(220, 20, 60, 0.08);
+  border-radius: 10px;
+  font-size: 0.83rem;
+  color: #1a1f2e;
+  line-height: 1.5;
+}
+.vertalen-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border-top: 1px solid rgba(26, 31, 46, 0.08);
+  background: #ffffff;
+}
+.vertalen-card__actions button {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(26, 31, 46, 0.12);
+  background: #ffffff;
+  color: #1a1f2e;
+  cursor: pointer;
+  font: 600 0.78rem/1 inherit;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.vertalen-card__actions button:hover {
+  background: rgba(220, 20, 60, 0.08);
+  color: #dc143c;
+  border-color: #dc143c;
+}
+.vertalen-spinner {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 2px solid rgba(220, 20, 60, 0.2);
+  border-top-color: #dc143c;
+  animation: vertalen-spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes vertalen-spin { to { transform: rotate(360deg); } }
+.vertalen-progress {
+  width: clamp(220px, 22vw, 320px);
+  background: #ffffff !important;
+  color: #1a1f2e !important;
+  border: 1px solid rgba(26, 31, 46, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(220, 20, 60, 0.18);
+  padding: 0.7rem 0.8rem;
+  display: grid;
+  gap: 0.45rem;
+  opacity: 1 !important;
+}
+.vertalen-progress__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vertalen-progress__title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #dc143c;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vertalen-progress__cancel {
+  background: transparent;
+  border: 1px solid rgba(26, 31, 46, 0.12);
+  color: #4b5563;
+  border-radius: 8px;
+  font: 600 0.75rem/1 inherit;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+}
+.vertalen-progress__cancel:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+.vertalen-progress__label {
+  font-size: 0.85rem;
+  color: #1a1f2e;
+}
+.vertalen-progress__track {
+  height: 6px;
+  background: rgba(26, 31, 46, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.vertalen-progress__bar {
+  height: 100%;
+  background: #dc143c;
+  width: 0;
+  transition: width 0.25s ease;
+}
+.vertalen-progress--done .vertalen-progress__bar {
+  background: #10b981;
+}
+.vertalen-progress--error .vertalen-progress__bar {
+  background: #b91c1c;
+}
+.vertalen-imm-pop {
+  width: clamp(220px, min(24vw, 100vw - 24px), 320px);
+  max-width: calc(100vw - 24px);
+  margin: 0;
+  background: #ffffff !important;
+  color: #1a1f2e !important;
+  border-radius: 14px;
+  border: 1px solid rgba(26, 31, 46, 0.14);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 16px 40px rgba(0, 56, 147, 0.18);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  font-size: 15px;
+  opacity: 1 !important;
+}
+.vertalen-imm-pop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 56, 147, 0.12);
+  border-bottom: 1px solid rgba(0, 56, 147, 0.2);
+}
+.vertalen-imm-pop__pair {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #003893;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.vertalen-imm-pop__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgba(26, 31, 46, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4b5563;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.vertalen-imm-pop__close:hover {
+  background: #ffffff;
+  color: #1a1f2e;
+  border-color: rgba(0, 56, 147, 0.35);
+}
+.vertalen-imm-pop__body {
+  padding: 0.85rem 0.9rem 0.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%);
+  display: grid;
+  gap: 0.35rem;
+}
+.vertalen-imm-pop__primary {
+  font-size: clamp(1.05rem, 2vw + 0.5rem, 1.2rem);
+  font-weight: 700;
+  color: #002766;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.vertalen-imm-pop__english {
+  font-size: 0.82rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+.vertalen-imm-pop__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  background: #f3f4f9;
+  border-top: 1px solid rgba(26, 31, 46, 0.1);
+}
+.vertalen-imm-pop__actions button {
+  flex: 1 1 calc(50% - 0.25rem);
+  min-width: 6.5rem;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.08s ease;
+}
+.vertalen-imm-pop__actions button:active {
+  transform: scale(0.98);
+}
+.vertalen-imm-pop__know {
+  border: 1px solid #dc143c;
+  background: #dc143c;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(220, 20, 60, 0.3);
+}
+.vertalen-imm-pop__know:hover {
+  background: #b91030;
+  border-color: #b91030;
+}
+.vertalen-imm-pop__again {
+  border: 1px solid rgba(0, 56, 147, 0.45);
+  background: #ffffff;
+  color: #003893;
+}
+.vertalen-imm-pop__again:hover {
+  background: rgba(0, 56, 147, 0.08);
+  border-color: #003893;
+}
+@media (prefers-color-scheme: dark) {
+  .vertalen-imm-pop {
+    background: #2a1218;
+    color: #f5e6e8;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 4px 12px rgba(0, 0, 0, 0.45),
+      0 20px 48px rgba(0, 0, 0, 0.55);
+  }
+  .vertalen-imm-pop__head {
+    background: rgba(106, 142, 255, 0.14);
+    border-bottom-color: rgba(106, 142, 255, 0.28);
+  }
+  .vertalen-imm-pop__pair {
+    color: #9ab0ff;
+  }
+  .vertalen-imm-pop__close {
+    background: rgba(42, 18, 24, 0.9);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #d4c4c8;
+  }
+  .vertalen-imm-pop__close:hover {
+    background: #3a1c28;
+    color: #f5e6e8;
+    border-color: rgba(154, 176, 255, 0.45);
+  }
+  .vertalen-imm-pop__body {
+    background: linear-gradient(180deg, #2a1218 0%, #241018 100%);
+  }
+  .vertalen-imm-pop__primary {
+    color: #c8d4ff;
+  }
+  .vertalen-imm-pop__english {
+    color: #b09098;
+  }
+  .vertalen-imm-pop__actions {
+    background: #1f0e14;
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+  .vertalen-imm-pop__know {
+    background: #ff5c7a;
+    border-color: #ff5c7a;
+    color: #1a0810;
+    box-shadow: 0 2px 10px rgba(255, 92, 122, 0.35);
+  }
+  .vertalen-imm-pop__know:hover {
+    background: #ff7a92;
+    border-color: #ff7a92;
+    color: #1a0810;
+  }
+  .vertalen-imm-pop__again {
+    background: rgba(42, 18, 24, 0.95);
+    border-color: rgba(154, 176, 255, 0.45);
+    color: #9ab0ff;
+  }
+  .vertalen-imm-pop__again:hover {
+    background: rgba(106, 142, 255, 0.16);
+    border-color: #9ab0ff;
+  }
+}
+`;
+
   const state = {
     settings: null,
     button: null,
@@ -37,6 +572,7 @@
     pendingRequest: null,
     immersion: null,
     immersionPopover: null,
+    immersionObserver: null,
   };
 
   const E = {
@@ -45,35 +581,120 @@
     progress: null,
   };
 
+  const BLOCKED_HINT =
+    "This site is on vertalen's blocklist (search, social, or challenge pages). You can change the list in Settings → Blocked sites.";
+
+  let immersionAfterLoadHooked = false;
+  let extensionContextLost = false;
+
+  function isExtensionContextValid() {
+    try {
+      return Boolean(chrome.runtime && chrome.runtime.id);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markContextLost() {
+    if (extensionContextLost) return;
+    extensionContextLost = true;
+    try {
+      state.immersionObserver?.disconnect();
+    } catch (_) {}
+    try {
+      teardownImmersion();
+    } catch (_) {}
+    try {
+      hideButton();
+      hideTooltip();
+      hideImmersionPopover();
+      hideProgress();
+    } catch (_) {}
+    try {
+      document.removeEventListener("mouseup", onMouseUp, true);
+      document.removeEventListener("keyup", onKeyUp, true);
+      document.removeEventListener("mousedown", onMouseDown, true);
+      document.removeEventListener("scroll", repositionEphemeral, true);
+      window.removeEventListener("resize", repositionEphemeral);
+    } catch (_) {}
+  }
+
+  function safeSendMessage(message, callback) {
+    if (extensionContextLost || !isExtensionContextValid()) {
+      markContextLost();
+      if (typeof callback === "function") callback(null);
+      return;
+    }
+    try {
+      chrome.runtime.sendMessage(message, (resp) => {
+        const err = chrome.runtime.lastError;
+        if (err) {
+          if (/context invalidated/i.test(err.message || "")) markContextLost();
+          if (typeof callback === "function") callback(null);
+          return;
+        }
+        if (typeof callback === "function") callback(resp);
+      });
+    } catch (err) {
+      if (/context invalidated/i.test(err?.message || "")) markContextLost();
+      if (typeof callback === "function") callback(null);
+    }
+  }
+
+  function scheduleImmersionWhenReady() {
+    if (!state.settings?.immersionEnabled) {
+      teardownImmersion();
+      return;
+    }
+    const run = () => {
+      if (document.readyState !== "complete") return;
+      maybeStartImmersion();
+    };
+    if (document.readyState === "complete") {
+      queueMicrotask(run);
+      return;
+    }
+    if (!immersionAfterLoadHooked) {
+      immersionAfterLoadHooked = true;
+      window.addEventListener("load", () => run(), { once: true });
+    }
+  }
+
   bootstrap();
 
   async function bootstrap() {
     state.settings = await getSettings();
-    chrome.runtime.onMessage.addListener(onRuntimeMessage);
+    if (extensionContextLost) return;
+    try {
+      chrome.runtime.onMessage.addListener(onRuntimeMessage);
+    } catch (_) {
+      markContextLost();
+      return;
+    }
     document.addEventListener("mouseup", onMouseUp, true);
     document.addEventListener("keyup", onKeyUp, true);
     document.addEventListener("mousedown", onMouseDown, true);
     document.addEventListener("scroll", repositionEphemeral, true);
     window.addEventListener("resize", repositionEphemeral);
-    chrome.storage?.onChanged?.addListener((changes) => {
-      if (changes.settings) {
-        getSettings().then((s) => {
-          state.settings = s;
-          maybeStartImmersion();
-        });
-      }
-    });
-    maybeStartImmersion();
+    try {
+      chrome.storage?.onChanged?.addListener((changes) => {
+        if (extensionContextLost) return;
+        if (changes.settings) {
+          getSettings().then((s) => {
+            state.settings = s;
+            scheduleImmersionWhenReady();
+          });
+        }
+      });
+    } catch (_) {}
+    scheduleImmersionWhenReady();
   }
 
   function getSettings() {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage(
-        { type: "vertalen/get_settings" },
-        (resp) => {
-          resolve(resp?.settings || {});
-        },
-      );
+      safeSendMessage({ type: "vertalen/get_settings" }, (resp) => {
+        resolve(resp?.settings || {});
+      });
     });
   }
 
@@ -92,6 +713,10 @@
       const sel = window.getSelection();
       const text = sel ? sel.toString().trim() : "";
       if (!text || text.length < 2) {
+        hideButton();
+        return;
+      }
+      if (isUrlBlockedForVertalen(location.href, state.settings || {})) {
         hideButton();
         return;
       }
@@ -256,6 +881,16 @@
     const text = textOverride || state.lastSelection?.text;
     if (!text) return;
     const settings = state.settings || {};
+    if (isUrlBlockedForVertalen(location.href, settings)) {
+      showTooltip(state.lastSelection?.rect || lastViewportCenter(), {
+        original: text,
+        translated: BLOCKED_HINT,
+        error: true,
+        srcLabel: "",
+        tgtLabel: "",
+      });
+      return;
+    }
     showTooltip(state.lastSelection?.rect || lastViewportCenter(), {
       original: text,
       translated: "",
@@ -263,7 +898,7 @@
       srcLabel: "",
       tgtLabel: codeToLabel(tgtOverride || settings.defaultTgt || "nep"),
     });
-    chrome.runtime.sendMessage(
+    safeSendMessage(
       {
         type: MSG.TRANSLATE_TEXT,
         text,
@@ -314,10 +949,12 @@
   }
 
   function injectShadowStyles(shadow) {
-    const styleHref = chrome.runtime.getURL("content/tooltip.css");
+    const sync = document.createElement("style");
+    sync.textContent = CRITICAL_CSS;
+    shadow.appendChild(sync);
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = styleHref;
+    link.href = chrome.runtime.getURL("content/tooltip.css");
     shadow.appendChild(link);
   }
 
@@ -403,20 +1040,20 @@
     return { host, shadow, set };
   }
 
-  // ───────────────────────── Immersion mode ─────────────────────────
-
   async function maybeStartImmersion() {
     if (!state.settings) return;
     if (!state.settings.immersionEnabled) {
       teardownImmersion();
       return;
     }
+    if (document.readyState !== "complete") return;
+    if (shouldSkipImmersivePage(document, location, state.settings)) {
+      teardownImmersion();
+      return;
+    }
     if (state.immersion?.running) return;
     const resp = await new Promise((resolve) => {
-      chrome.runtime.sendMessage({ type: MSG.IMMERSION_BOOTSTRAP }, (r) => {
-        if (chrome.runtime.lastError) resolve(null);
-        else resolve(r);
-      });
+      safeSendMessage({ type: MSG.IMMERSION_BOOTSTRAP }, (r) => resolve(r));
     });
     if (!resp?.ok || !resp.enabled || !Array.isArray(resp.entries)) return;
     if (resp.entries.length === 0) return;
@@ -462,12 +1099,14 @@
     start(() => {
       try {
         scanForImmersion(document.body);
-      } catch (err) {
-        // Fail quietly to avoid breaking the host page.
-      }
+      } catch (_) {}
     });
     if (typeof MutationObserver !== "undefined") {
       const observer = new MutationObserver((mutations) => {
+        if (extensionContextLost) {
+          observer.disconnect();
+          return;
+        }
         if (!state.immersion?.running) return;
         if (state.immersion.candidatesShown >= state.immersion.maxOnPage) return;
         for (const m of mutations) {
@@ -477,6 +1116,7 @@
         }
       });
       observer.observe(document.body, { childList: true, subtree: true });
+      state.immersionObserver = observer;
     }
   }
 
@@ -623,7 +1263,7 @@
     span.addEventListener("mouseenter", onImmersionHover);
     span.addEventListener("click", onImmersionClick);
     state.immersion.seen.add(key);
-    chrome.runtime.sendMessage({
+    safeSendMessage({
       type: MSG.IMMERSION_RECORD,
       word: key,
       action: "shown",
@@ -635,7 +1275,7 @@
     const el = e.currentTarget;
     const key = el.getAttribute("data-vertalen-imm-key");
     if (!key) return;
-    chrome.runtime.sendMessage({
+    safeSendMessage({
       type: MSG.IMMERSION_RECORD,
       word: key,
       action: "hovered",
@@ -655,10 +1295,15 @@
     const key = el.getAttribute("data-vertalen-imm-key");
     const translated = el.textContent;
     state.immersionPopover.set({ original, key, translated });
-    state.immersionPopover.host.style.display = "block";
-    positionTo(state.immersionPopover.host, el.getBoundingClientRect(), {
-      offsetY: 8,
-      preferCenterX: true,
+    const host = state.immersionPopover.host;
+    const rect = el.getBoundingClientRect();
+    host.style.display = "block";
+    positionTo(host, rect, { offsetY: 8, preferCenterX: true });
+    requestAnimationFrame(() => {
+      positionTo(host, el.getBoundingClientRect(), {
+        offsetY: 8,
+        preferCenterX: true,
+      });
     });
   }
 
@@ -691,7 +1336,7 @@
     card.querySelector(".vertalen-imm-pop__know").addEventListener("click", () => {
       const key = card.dataset.key;
       if (key) {
-        chrome.runtime.sendMessage({
+        safeSendMessage({
           type: MSG.IMMERSION_RECORD,
           word: key,
           action: "correct",
@@ -702,7 +1347,7 @@
     card.querySelector(".vertalen-imm-pop__again").addEventListener("click", () => {
       const key = card.dataset.key;
       if (key) {
-        chrome.runtime.sendMessage({
+        safeSendMessage({
           type: MSG.IMMERSION_RECORD,
           word: key,
           action: "again",
@@ -743,7 +1388,7 @@
     host.style.top = "16px";
 
     bar.querySelector(".vertalen-progress__cancel").addEventListener("click", () => {
-      chrome.runtime.sendMessage({ type: "vertalen/cancel_page" });
+      safeSendMessage({ type: "vertalen/cancel_page" });
       hideProgress();
     });
 

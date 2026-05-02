@@ -1,15 +1,3 @@
-/**
- * Language constants and helpers for the TMT API.
- *
- * The TMT API accepts case-insensitive codes in three forms:
- *   - Full name: English / Nepali / Tamang
- *   - 2-letter:  en / ne / (no ISO-639-1 for Tamang)
- *   - 3-letter:  eng / nep / tmg
- *
- * Internally we use the 3-letter codes as the canonical identifier
- * because they are stable and uniquely cover all three languages.
- */
-
 export const LANGUAGES = Object.freeze({
   ENGLISH: {
     code: "eng",

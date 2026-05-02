@@ -1,19 +1,4 @@
 #!/usr/bin/env bash
-#
-# vertalen — release build script
-#
-# Produces release/vertalen-<version>.zip ready for the GitHub Release.
-# Performs a defense-in-depth secret scan first so an accidental
-# committed key never makes it into a public release.
-#
-# Usage:
-#   ./scripts/build-release.sh
-#
-# Exits non-zero on:
-#   - Secret-scan match
-#   - Missing extension/ folder
-#   - Missing or unparseable manifest.json
-
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,9 +29,6 @@ fi
 echo "==> Building vertalen v$VERSION"
 
 echo "==> Scanning for accidental secrets in extension/"
-# Strict: only matches real hex tokens (team_<16+ hex chars>) so the
-# documented placeholder team_xxxxxxxxxxxxxxxx (only 'x' characters)
-# does not produce a false positive.
 PATTERNS=(
   'team_[a-f0-9]{16,}'
   'Bearer\s+team_[a-f0-9]{16,}'

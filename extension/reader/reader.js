@@ -29,15 +29,20 @@ init();
 
 async function init() {
   const params = new URLSearchParams(location.search);
+  const id = params.get("id");
   const raw = params.get("d");
-  if (!raw) {
-    els.docTitle.textContent = "No content provided";
-    return;
+  if (id) {
+    state.doc = await Storage.takeReaderDraft(id);
+  } else if (raw) {
+    try {
+      state.doc = JSON.parse(decodeURIComponent(raw));
+    } catch {
+      state.doc = null;
+    }
   }
-  try {
-    state.doc = JSON.parse(decodeURIComponent(raw));
-  } catch {
-    els.docTitle.textContent = "Could not parse content.";
+  if (!state.doc) {
+    els.docTitle.textContent =
+      "Reader content was not available. Open the reader again from the page.";
     return;
   }
   renderDocument(state.doc);

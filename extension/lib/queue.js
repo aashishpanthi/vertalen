@@ -1,19 +1,3 @@
-/**
- * Token-bucket request queue for the TMT API.
- *
- * The endpoint is rate-limited at 60 requests / minute (HTTP 429
- * "60 per 1 minute"). To stay safely below the ceiling we default
- * to 55 req/min with a small concurrency window so the user
- * still sees streaming progress on long pages.
- *
- * Features:
- *   - Token bucket refilled at a steady rate (smooth, not bursty)
- *   - Fixed concurrency cap to avoid head-of-line blocking
- *   - First-class cancellation: pass an AbortSignal in metadata
- *   - Priority lanes: "interactive" (selection / popup) jumps the
- *     full-page lane so the user never feels blocked by a bulk job
- */
-
 const PRIORITY = Object.freeze({
   INTERACTIVE: 0,
   PAGE: 1,
@@ -21,12 +5,6 @@ const PRIORITY = Object.freeze({
 });
 
 export class RateLimitedQueue {
-  /**
-   * @param {object} opts
-   * @param {number} opts.requestsPerMinute Max requests per 60s window
-   * @param {number} opts.concurrency Max in-flight requests
-   * @param {number} opts.minSpacingMs Minimum gap between dispatches
-   */
   constructor({
     requestsPerMinute = 55,
     concurrency = 4,
@@ -62,10 +40,6 @@ export class RateLimitedQueue {
     }
   }
 
-  /**
-   * Submit a task. The task receives no arguments and must return a
-   * Promise. Pass an AbortSignal to cancel before dispatch.
-   */
   enqueue(task, { priority = PRIORITY.INTERACTIVE, signal } = {}) {
     return new Promise((resolve, reject) => {
       const lane = Math.min(Math.max(priority, 0), this.queues.length - 1);

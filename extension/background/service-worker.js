@@ -1,18 +1,3 @@
-/**
- * vertalen — service worker (Chrome MV3)
- *
- * The background service worker is the only place that holds the API
- * key in memory and the only place that touches the TMT endpoint.
- * Content scripts, the popup, options page, onboarding, and reader
- * mode all communicate via chrome.runtime.sendMessage / onMessage.
- *
- * Responsibilities:
- *   - Load and refresh the API key on demand
- *   - Translate single sentences and batches with caching + retry
- *   - Run full-page translation jobs with progress reporting
- *   - Drive context menus, keyboard commands, and notifications
- */
-
 import { TMTClient, TMTError, makeTMKey } from "../lib/api.js";
 import { Storage } from "../lib/storage.js";
 import { TranslationCache } from "../lib/cache.js";
@@ -29,8 +14,12 @@ import {
   pickCandidates as pickImmersionCandidates,
   buildQuizRound,
 } from "../lib/srs.js";
+import { isUrlBlockedForVertalen } from "../lib/site-blocklist.js";
 
 const client = new TMTClient({});
+
+const BLOCKED_SITE =
+  "This site is blocked for translation (search, social, or your blocklist). Change it in vertalen Settings → Blocked sites.";
 const queue = new RateLimitedQueue({ requestsPerMinute: 55, concurrency: 4 });
 const activeJobs = new Map();
 
@@ -185,7 +174,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const settings = await Storage.getSettings();
 
   if (info.menuItemId === "vertalen.openReader") {
-    chrome.runtime.sendMessage({ type: MSG.OPEN_READER, tabId: tab.id }).catch(() => {});
     openReader(tab.id);
     return;
   }
@@ -195,6 +183,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const tgt = matches[1];
   const text = info.selectionText || "";
   if (!text.trim()) return;
+
+  if (tab.url && isUrlBlockedForVertalen(tab.url, settings)) {
+    notifyError(new TMTError(BLOCKED_SITE, { kind: "blocked", retryable: false }));
+    return;
+  }
 
   const src = settings.autoDetectSrc
     ? detect(text, settings.defaultSrc === "tmg" ? "tmg" : "nep") || settings.defaultSrc
@@ -472,14 +465,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function runPageTranslate(tabId, { src, tgt } = {}) {
+  const sendProgress = (payload) =>
+    chrome.tabs.sendMessage(tabId, { type: MSG.PAGE_PROGRESS, ...payload }).catch(() => {});
+
   if (activeJobs.has(tabId)) {
     activeJobs.get(tabId).abort.abort();
   }
+
+  const apiKey = await Storage.getApiKey();
+  if (!apiKey) {
+    const msg = "Add your TMT API token in vertalen settings to translate pages.";
+    notifyError(new TMTError(msg, { kind: "auth" }));
+    sendProgress({ stage: "error", error: msg });
+    return;
+  }
+
   const settings = await Storage.getSettings();
+  const tab = await chrome.tabs.get(tabId).catch(() => null);
+  if (tab?.url && isUrlBlockedForVertalen(tab.url, settings)) {
+    notifyError(new TMTError(BLOCKED_SITE, { kind: "blocked", retryable: false }));
+    sendProgress({ stage: "error", error: BLOCKED_SITE });
+    return;
+  }
+
   const finalSrc = src || settings.defaultSrc;
   const finalTgt = tgt || settings.defaultTgt;
   if (!isPairSupported(finalSrc, finalTgt)) {
-    notifyError(new TMTError(`Unsupported pair: ${finalSrc} → ${finalTgt}.`));
+    const msg = `Unsupported pair: ${finalSrc} → ${finalTgt}. Pick different languages.`;
+    notifyError(new TMTError(msg));
+    sendProgress({ stage: "error", error: msg });
     return;
   }
 
@@ -487,88 +501,118 @@ async function runPageTranslate(tabId, { src, tgt } = {}) {
   activeJobs.set(tabId, { abort });
 
   try {
-    chrome.tabs.sendMessage(tabId, {
-      type: MSG.PAGE_PROGRESS,
-      stage: "starting",
-      src: finalSrc,
-      tgt: finalTgt,
-    }).catch(() => {});
+    sendProgress({ stage: "starting", src: finalSrc, tgt: finalTgt });
 
-    const [{ result: nodes } = {}] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: collectTextNodes,
-    });
+    let nodes;
+    try {
+      const [{ result } = {}] = await chrome.scripting.executeScript({
+        target: { tabId },
+        func: collectTextNodes,
+      });
+      nodes = result;
+    } catch (err) {
+      const msg = `Can't read this page (${err?.message || err}).`;
+      notifyError(new TMTError(msg));
+      sendProgress({ stage: "error", error: msg });
+      return;
+    }
+
     if (!Array.isArray(nodes) || !nodes.length) {
-      chrome.tabs.sendMessage(tabId, {
-        type: MSG.PAGE_PROGRESS,
-        stage: "done",
-        translated: 0,
-        total: 0,
-      }).catch(() => {});
+      sendProgress({
+        stage: "error",
+        error: "No translatable text found on this page.",
+      });
       return;
     }
 
     const total = nodes.length;
     let translated = 0;
+    let failed = 0;
+    let firstError = null;
 
-    const concurrencyLane = nodes.map(async (node) => {
-      if (abort.signal.aborted) return;
-      try {
-        const { translated: outputText } = await translateText(
-          node.text,
-          finalSrc,
-          finalTgt,
-          {
-            signal: abort.signal,
-            priority: RateLimitedQueue.PRIORITY.PAGE,
-          },
-        );
-        await chrome.scripting.executeScript({
-          target: { tabId },
-          func: applyTranslatedNode,
-          args: [node.id, outputText],
-        });
-      } catch (err) {
-        if (err?.name === "AbortError") return;
-      } finally {
-        translated += 1;
-        chrome.tabs.sendMessage(tabId, {
-          type: MSG.PAGE_PROGRESS,
-          stage: "progress",
-          translated,
-          total,
-        }).catch(() => {});
-      }
-    });
+    await Promise.all(
+      nodes.map(async (node) => {
+        if (abort.signal.aborted) return;
+        try {
+          const { translated: outputText } = await translateText(
+            node.text,
+            finalSrc,
+            finalTgt,
+            {
+              signal: abort.signal,
+              priority: RateLimitedQueue.PRIORITY.PAGE,
+            },
+          );
+          await chrome.scripting.executeScript({
+            target: { tabId },
+            func: applyTranslatedNode,
+            args: [node.id, outputText],
+          });
+        } catch (err) {
+          if (err?.name === "AbortError") return;
+          failed += 1;
+          if (!firstError) firstError = err;
+          console.error("[vertalen] page translate node failed:", err);
+        } finally {
+          translated += 1;
+          sendProgress({ stage: "progress", translated, total });
+        }
+      }),
+    );
 
-    await Promise.all(concurrencyLane);
+    if (failed > 0 && translated === failed) {
+      const msg =
+        firstError?.message || "Translation failed. Check your API token in settings.";
+      notifyError(new TMTError(msg));
+      sendProgress({ stage: "error", error: msg });
+      return;
+    }
 
-    chrome.tabs.sendMessage(tabId, {
-      type: MSG.PAGE_PROGRESS,
+    sendProgress({
       stage: "done",
-      translated,
+      translated: total - failed,
       total,
-    }).catch(() => {});
+      failed,
+    });
   } catch (err) {
     notifyError(err);
-    chrome.tabs.sendMessage(tabId, {
-      type: MSG.PAGE_PROGRESS,
+    sendProgress({
       stage: "error",
       error: err?.message || String(err),
-    }).catch(() => {});
+    });
   } finally {
     activeJobs.delete(tabId);
   }
 }
 
 async function openReader(tabId) {
-  const [{ result } = {}] = await chrome.scripting.executeScript({
-    target: { tabId },
-    func: extractReadableContent,
-  });
-  if (!result) return;
-  const payload = encodeURIComponent(JSON.stringify(result));
-  const url = chrome.runtime.getURL(`reader/reader.html?d=${payload}`);
+  const settings = await Storage.getSettings();
+  const tab = await chrome.tabs.get(tabId).catch(() => null);
+  if (tab?.url && isUrlBlockedForVertalen(tab.url, settings)) {
+    notifyError(new TMTError(BLOCKED_SITE, { kind: "blocked", retryable: false }));
+    return;
+  }
+  let result;
+  try {
+    [{ result } = {}] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: extractReadableContent,
+    });
+  } catch (err) {
+    notifyError(new TMTError(`Reader can't run on this page: ${err?.message || err}`));
+    return;
+  }
+  if (!result || !Array.isArray(result.blocks) || result.blocks.length === 0) {
+    notifyError(
+      new TMTError(
+        "vertalen could not find readable text on this page. Try Translate this page instead.",
+      ),
+    );
+    return;
+  }
+  const id = `r_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  await Storage.putReaderDraft(id, result);
+  const url = chrome.runtime.getURL(`reader/reader.html?id=${id}`);
   chrome.tabs.create({ url });
 }
 
@@ -610,7 +654,6 @@ function collectTextNodes() {
     "AUDIO",
     "CANVAS",
   ]);
-  const ATTR = "data-vertalen-id";
   const NODE_ATTR = "data-vertalen-node";
   let counter = 0;
   const collected = [];
@@ -620,7 +663,9 @@ function collectTextNodes() {
       const parent = node.parentElement;
       if (!parent) return NodeFilter.FILTER_REJECT;
       if (SKIP_TAGS.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
-      if (parent.closest(`[${ATTR}]`)) return NodeFilter.FILTER_REJECT;
+      if (parent.closest(`[${NODE_ATTR}], .vertalen-imm, .vertalen-root`)) {
+        return NodeFilter.FILTER_REJECT;
+      }
       if (parent.isContentEditable) return NodeFilter.FILTER_REJECT;
       if (parent.getAttribute && parent.getAttribute("translate") === "no") {
         return NodeFilter.FILTER_REJECT;
@@ -649,7 +694,7 @@ function applyTranslatedNode(id, translated) {
   el.textContent = translated;
   el.setAttribute("data-vertalen-translated", "1");
   el.style.transition = "background-color 0.4s ease";
-  el.style.backgroundColor = "rgba(15, 118, 110, 0.12)";
+  el.style.backgroundColor = "rgba(220, 20, 60, 0.12)";
   setTimeout(() => {
     el.style.backgroundColor = "transparent";
   }, 800);

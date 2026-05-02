@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "vertalen",
   "version": "1.0.0",
-  "description": "Translate any web page or selection between English, Nepali, and Tamang. Powered by the Google TMT API.",
+  "description": "Translate web pages between English, Nepali, and Tamang. Includes optional vocabulary immersion while you read. Powered by the Google TMT API.",
   "author": "Aashish Panthi",
   "homepage_url": "https://github.com/aashishpanthi/vertalen",
   "minimum_chrome_version": "114",
@@ -80,6 +80,8 @@
       "resources": [
         "onboarding/welcome.html",
         "reader/reader.html",
+        "content/tooltip.css",
+        "lib/vocab.json",
         "icons/*.png"
       ],
       "matches": ["<all_urls>"]

@@ -1,13 +1,16 @@
-# vertalen — Trilingual TMT Translator + Tamang Learning Companion
+# vertalen — Trilingual TMT Translator + Vocabulary Companion
 
-> Built for the **Google TMT Hackathon 2026**, Track 1 (Browser Plugin / Extension).
-> Two modes in one extension: a real-time **trilingual translator** between English, Nepali, and Tamang, and a passive **immersion learning** mode that helps you pick up Tamang vocabulary while you browse the web. Powered by the [Google TMT](https://tmt.ilprl.ku.edu.np/) machine translation system at Kathmandu University.
+> Translate the web between **English**, **Nepali**, and **Tamang**, with an optional **immersion** mode that mixes in vocabulary as you read. Powered by the public [Google TMT](https://tmt.ilprl.ku.edu.np/) service (ILPRL,).
 
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-brightgreen)](https://developer.chrome.com/docs/extensions/mv3/intro/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+## UI colors
+
+**Crimson** (`#DC143C`) is used for translation and primary actions. **Royal blue** (`#003893`) is used for the Learn tab, immersion highlights, reader translation column, and other secondary accents so the two modes are easy to tell apart.
+
 ## Why Tamang?
 
-Tamang has roughly **1.3 million speakers** in Nepal and is on UNESCO's vulnerability list — most learners and even diaspora children grow up without ever encountering the language outside the home. Google's TMT project at Kathmandu University is one of very few credible MT systems for it. `vertalen`'s second mode treats every English webpage you read as an ambient classroom: it weaves a few Tamang (or Nepali) words into the page, hover-reveals the original, and turns daily browsing into a passive route to vocabulary acquisition. Translation alone is useful; *translation that helps preserve the language* is the actual mission.
+Tamang has roughly **1.3 million speakers** and is on UNESCO’s list of vulnerable languages — many learners rarely see it in everyday digital life. The TMT system is one of few public machine translation options for Tamang. Immersion mode turns ordinary English pages into light vocabulary practice so translation and language exposure work together.
 
 ---
 
@@ -15,16 +18,15 @@ Tamang has roughly **1.3 million speakers** in Nepal and is on UNESCO's vulnerab
 
 1. [What it does](#what-it-does)
 2. [Demo video](#demo-video)
-3. [Quick install (for evaluators)](#quick-install-for-evaluators)
+3. [Quick install](#quick-install)
 4. [Features](#features)
 5. [Project structure](#project-structure)
 6. [Architecture overview](#architecture-overview)
 7. [Security &amp; privacy](#security--privacy)
 8. [Development](#development)
 9. [Building a release](#building-a-release)
-10. [Evaluation rubric coverage](#evaluation-rubric-coverage)
-11. [Roadmap](#roadmap)
-12. [License](#license)
+10. [Roadmap](#roadmap)
+11. [License](#license)
 
 ---
 
@@ -56,7 +58,7 @@ A passive language-learning layer:
 - A spaced-repetition scheduler tracks your confidence per word and surfaces less-known words more often.
 - A flashcard quiz inside the popup quizzes you on words you've already encountered.
 - Streak counter, daily goal, and mastered-word count.
-- Off by default; one click to enable from the welcome page or popup.
+- **On by default** — disable in settings or the welcome flow if you want translation only.
 
 The vocabulary set ships pre-translated as `extension/lib/vocab.json` (~200 curated common-English words → Nepali + Tamang), so immersion mode makes **zero TMT API calls during normal browsing**. The pre-translation step uses `scripts/build-vocab.js`.
 
@@ -64,7 +66,7 @@ The vocabulary set ships pre-translated as `extension/lib/vocab.json` (~200 cura
 
 ## Demo video
 
-> Replace this placeholder with the GitHub Release asset URL or YouTube link before submission.
+> Replace this placeholder with your demo URL (e.g. GitHub Release asset or YouTube).
 
 📹 **Demo:** _https://youtu.be/REPLACE_WITH_VIDEO_ID_
 
@@ -72,7 +74,7 @@ The video shows: install → API key entry → selection translation → full-pa
 
 ---
 
-## Quick install (for evaluators)
+## Quick install
 
 `vertalen` ships as an unpacked Chrome extension. **No build tools required.**
 
@@ -81,18 +83,19 @@ The video shows: install → API key entry → selection translation → full-pa
 3. Open Chrome and navigate to `chrome://extensions`.
 4. Toggle **Developer mode** on (top-right).
 5. Click **Load unpacked** and select the `extension/` folder inside the unzipped archive.
-6. The vertalen welcome page opens automatically.
-7. Paste your TMT team token (`team_xxxxxxxxxxxxxxxx`) and click **Save key**.
-8. Try the sample translation on the welcome page to confirm everything works.
+6. The welcome page may open on first install.
+7. **Immersion learning** is **on by default** — browse English sites to see Nepali/Tamang vocabulary (no API key needed for that).
+8. Paste your TMT API bearer token and click **Save key** when you want **live translation** (selection, full page, reader, popup).
+9. Try the sample translation on the welcome page to confirm the API works.
 
-That's it. Pin the extension to your toolbar to use it everywhere.
+Pin the extension to your toolbar to use it everywhere.
 
-> **Note:** the API token is **never** committed to this repository. Each team's token is private. Evaluators should use their own team token from the registration email. If you do not have a token, contact the TMT organizing team.
+> **Note:** API tokens are **never** committed to this repository. Use your own token with the TMT service. **Without a token**, immersion and quizzes still work from bundled vocabulary; only live translation through the API is disabled.
 
 ### Minimum requirements
 
 - Chrome 114+ (for the latest Manifest V3 features)
-- A valid TMT team token
+- A valid TMT team token **only** for API-backed translation (selection, page, reader, popup). Immersion mode does not require a token.
 
 ---
 
@@ -117,7 +120,8 @@ That's it. Pin the extension to your toolbar to use it everywhere.
 - **Three keyboard shortcuts**: <kbd>Alt</kbd> + <kbd>T</kbd> (selection), <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> (page), <kbd>Alt</kbd> + <kbd>S</kbd> (swap defaults).
 - **Dark mode** based on `prefers-color-scheme` across every UI surface.
 - **Fluid layouts** — every popup, options panel, onboarding step, and reader column scales gracefully with viewport size and font size.
-- **Onboarding flow** — a four-step welcome page that opens automatically on install.
+- **Onboarding flow** — a five-step welcome page that opens automatically on install (API key + optional immersion tuning).
+- **Site blocklist** — skips full-page translate, reader, immersion, and on-page selection UI on search pages (Google `/search`, Bing, Yahoo, DuckDuckGo), major social/video hosts, and Cloudflare-style challenge pages. Editable under **Settings → Blocked sites** with sensible defaults (Facebook, YouTube, Reddit, etc.). Does not affect the popup textarea translator.
 
 ### Reliability
 
@@ -127,7 +131,7 @@ That's it. Pin the extension to your toolbar to use it everywhere.
 
 ### Immersion mode
 
-- **Off by default.** First-run welcome page asks once.
+- **On by default** — toggle off in settings or the welcome flow if you prefer a read-only translator.
 - **Pre-translated vocabulary** — `vocab.json` ships in the extension. No API calls during browsing.
 - **Spaced-repetition** (SuperMemo-2-inspired) tracks confidence in `[0, 5]` and surfaces words at the right time.
 - **Three difficulty levels** — start with the 130 most common words, unlock harder vocabulary as you progress.
@@ -146,7 +150,7 @@ google-TMT/
 │   ├── background/
 │   │   └── service-worker.js      # Translation orchestrator + message bus
 │   ├── content/
-│   │   ├── content.js             # Selection detection, tooltip, full-page UX
+│   │   ├── content.js             # Selection, tooltip, full-page UX (ES module)
 │   │   └── tooltip.css            # Shadow-DOM-scoped styles
 │   ├── popup/                     # Toolbar popup (translate, history, full-page)
 │   ├── options/                   # Settings page (API key, defaults, TM, history)
@@ -160,15 +164,15 @@ google-TMT/
 │   │   ├── messages.js            # Runtime message types
 │   │   ├── queue.js               # Token-bucket rate limiter
 │   │   ├── sentence-splitter.js   # Multi-script sentence splitter
+│   │   ├── site-blocklist.js      # Blocklist + search URL + bot-page detection
 │   │   ├── srs.js                 # Spaced-repetition + streak (immersion)
 │   │   ├── storage.js             # chrome.storage wrappers
 │   │   ├── vocab-loader.js        # Vocabulary loader + post-processor
 │   │   └── vocab.json             # 203 pre-translated EN→NE+TMG entries
-│   ├── _locales/                  # i18n placeholder
 │   └── icons/                     # 16 / 48 / 128 px PNGs
 ├── docs/
 │   ├── ARCHITECTURE.md            # Deep dive into how the pieces fit
-│   └── DEMO.md                    # Step-by-step demo script for evaluators
+│   └── DEMO.md                    # Step-by-step demo / walkthrough script
 ├── scripts/
 │   ├── build-release.sh           # Creates release/vertalen-<version>.zip
 │   └── build-vocab.js             # Pre-translates vocabulary via the TMT API
@@ -256,19 +260,6 @@ This produces `release/vertalen-<version>.zip` ready to upload to a GitHub Relea
 
 ---
 
-## Evaluation rubric coverage
-
-| Criterion | How vertalen addresses it |
-|---|---|
-| **Functionality &amp; accuracy** | All six TMT directions, sentence-level splitter, custom abbreviation guards, retry on transient errors, abort support, plus an immersion learning layer |
-| **Alignment with theme** | Built specifically for English / Nepali / Tamang. Immersion mode is a direct contribution to **Tamang language preservation** — the explicit mission of the TMT project at KU. Every UI surface uses Devanagari-aware fonts. |
-| **Code quality &amp; architecture** | 16 modular ES modules with single-responsibility files, message-bus separation, JSDoc-style headers explaining intent. Two clearly separated runtime modes share a single `lib/` |
-| **Documentation &amp; demo** | This README, an architecture deep-dive, a step-by-step demo script in `docs/DEMO.md`, and a video link |
-| **System design &amp; deployment** | Zero-build install ("Load unpacked"), one-script release, MV3-compliant, key-rotation friendly via the options page |
-| **User experience** | Non-destructive tooltip, dark mode, fluid layouts, onboarding flow, keyboard shortcuts, history, copy actions, immersion is opt-in with sensible defaults |
-
----
-
 ## Roadmap
 
 - Firefox port (manifest tweak + `webextension-polyfill`)
@@ -296,4 +287,4 @@ The script is incremental — it resumes from the existing `vocab.json` if inter
 
 [MIT](LICENSE) © 2026 Aashish Panthi
 
-Built with care for the [Google TMT Hackathon 2026](https://tmt.ilprl.ku.edu.np/) at Kathmandu University. Every text translation routes through the official TMT API.
+Translations use the public TMT API at `https://tmt.ilprl.ku.edu.np/lang-translate`.

@@ -1,26 +1,4 @@
 #!/usr/bin/env node
-/**
- * vertalen — vocabulary pre-translation script.
- *
- * One-time tool that takes a curated list of common English words and
- * pre-translates them into Nepali and Tamang via the TMT API. The
- * output lands at extension/lib/vocab.json and ships with the
- * extension so immersion mode does NOT make API calls during normal
- * browsing — it just looks words up.
- *
- * Usage:
- *   TMT_API_KEY=team_xxxxxxxxxxxxxxxx node scripts/build-vocab.js
- *
- * The script:
- *   - Reads the API key from the environment (never written to disk).
- *   - Resumes from a partial run by reading the existing vocab.json.
- *   - Respects the API's 60/min rate limit (defaults to 55/min).
- *   - Writes incrementally so an interrupted run loses no progress.
- *
- * If a translation is identical to the source word (or empty), we
- * still record it but flag it so the curator can review later.
- */
-
 "use strict";
 
 const fs = require("fs");

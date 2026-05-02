@@ -1,31 +1,4 @@
-/**
- * Multi-script sentence splitter optimized for English, Nepali, and Tamang.
- *
- * Why a custom splitter:
- *   - The TMT API is sentence-level only; paragraphs must be split first.
- *   - Off-the-shelf splitters miss the Devanagari danda (।) and double danda (॥).
- *   - We must keep punctuation attached so reassembly preserves spacing.
- *
- * Strategy:
- *   1. Normalize whitespace.
- *   2. Walk the string and emit a sentence whenever we encounter
- *      a sentence-terminating punctuation followed by whitespace
- *      or end-of-string.
- *   3. Handle common abbreviations (Mr., Dr., U.S., e.g.) so we
- *      don't over-split on periods.
- *   4. Keep the original whitespace between sentences as a separate
- *      "glue" entry so the reassembler can perfectly reconstruct
- *      the input.
- */
-
-const SENTENCE_TERMINATORS = new Set([
-  ".",
-  "!",
-  "?",
-  "।", // Devanagari danda U+0964
-  "॥", // Devanagari double danda U+0965
-  "…",
-]);
+const SENTENCE_TERMINATORS = new Set([".", "!", "?", "।", "॥", "…"]);
 
 const ABBREVIATIONS = new Set([
   "mr",
@@ -53,10 +26,10 @@ const ABBREVIATIONS = new Set([
 function isWordChar(ch) {
   if (!ch) return false;
   const code = ch.charCodeAt(0);
-  if (code >= 48 && code <= 57) return true; // 0-9
-  if (code >= 65 && code <= 90) return true; // A-Z
-  if (code >= 97 && code <= 122) return true; // a-z
-  if (code >= 0x0900 && code <= 0x097f) return true; // Devanagari
+  if (code >= 48 && code <= 57) return true;
+  if (code >= 65 && code <= 90) return true;
+  if (code >= 97 && code <= 122) return true;
+  if (code >= 0x0900 && code <= 0x097f) return true;
   return false;
 }
 
@@ -66,14 +39,6 @@ function tokenAtEnd(buffer) {
   return buffer.slice(i + 1).toLowerCase();
 }
 
-/**
- * Split text into sentence + glue pairs that perfectly reconstruct the input.
- *
- * @param {string} text
- * @returns {{ sentences: string[], glue: string[] }}
- *   sentences[i] is followed by glue[i] in the original text.
- *   glue.length === sentences.length, last glue may be empty.
- */
 export function splitSentences(text) {
   if (!text) return { sentences: [], glue: [] };
 
@@ -125,10 +90,6 @@ export function splitSentences(text) {
   return { sentences, glue };
 }
 
-/**
- * Reverse of splitSentences. Reassembles translated sentences using the
- * original glue so spacing/line-breaks match the source layout.
- */
 export function joinSentences(sentences, glue) {
   let out = "";
   for (let i = 0; i < sentences.length; i++) {
@@ -138,10 +99,6 @@ export function joinSentences(sentences, glue) {
   return out;
 }
 
-/**
- * Convenience: split, dedupe sentences for caching, return both the
- * unique-list (to translate) and a reassembly plan.
- */
 export function planTranslation(text) {
   const { sentences, glue } = splitSentences(text);
   const unique = [];

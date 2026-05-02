@@ -1,12 +1,4 @@
-/**
- * Promise-flavored wrappers around chrome.storage.local with sensible
- * defaults and per-namespace helpers.
- *
- * SECURITY: API key is stored in chrome.storage.local. This is local
- * to the user's profile and never transmitted unless the user
- * explicitly exports it. We intentionally avoid chrome.storage.sync
- * for the key so it never leaves the device.
- */
+import { BUILTIN_BLOCKED_HOST_SUFFIXES } from "./site-blocklist.js";
 
 const KEY = Object.freeze({
   API_KEY: "apiKey",
@@ -15,6 +7,7 @@ const KEY = Object.freeze({
   TM: "translationMemory",
   ONBOARDED: "onboarded",
   IMMERSION: "immersionState",
+  READER_DRAFT: "readerDraft",
 });
 
 const DEFAULT_SETTINGS = Object.freeze({
@@ -30,12 +23,14 @@ const DEFAULT_SETTINGS = Object.freeze({
   fullPagePreserveOriginal: true,
   fullPageStreamRender: true,
 
-  immersionEnabled: false,
+  immersionEnabled: true,
   immersionTarget: "tmg",
   immersionMaxLevel: 1,
   immersionDensity: 3,
   immersionDailyGoal: 5,
-  immersionSiteAllowAll: true,
+
+  translateBlocklistEnabled: true,
+  translateBlockedHosts: [...BUILTIN_BLOCKED_HOST_SUFFIXES],
 });
 
 export const SETTINGS_KEYS = Object.keys(DEFAULT_SETTINGS);
@@ -158,5 +153,24 @@ export const Storage = {
 
   async clearImmersionState() {
     await set({ [KEY.IMMERSION]: null });
+  },
+
+  async putReaderDraft(id, doc) {
+    const all = (await get(KEY.READER_DRAFT)) || {};
+    all[id] = { doc, ts: Date.now() };
+    const cutoff = Date.now() - 1000 * 60 * 30;
+    for (const k of Object.keys(all)) {
+      if ((all[k]?.ts || 0) < cutoff) delete all[k];
+    }
+    await set({ [KEY.READER_DRAFT]: all });
+  },
+
+  async takeReaderDraft(id) {
+    const all = (await get(KEY.READER_DRAFT)) || {};
+    const entry = all[id];
+    if (!entry) return null;
+    delete all[id];
+    await set({ [KEY.READER_DRAFT]: all });
+    return entry.doc || null;
   },
 };
