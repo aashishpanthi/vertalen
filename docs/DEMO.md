@@ -40,7 +40,8 @@ This proves the API key works end-to-end.
 
 ## 4. Right-click and shortcut (~30 s)
 
-- Highlight a sentence → right-click → **vertalen: translate selection → Translate to Tamang**.
+- Highlight a sentence → right-click → **vertalen → Translate selection to Tamang**.
+- Right-click anywhere on the page (no selection needed) → **vertalen → Translate this page** to run the same flow as the popup button.
 - Same flow with <kbd>Alt</kbd> + <kbd>T</kbd> on a selection.
 
 ## 5. Full-page translation (~60 s)

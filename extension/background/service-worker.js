@@ -120,29 +120,35 @@ async function buildContextMenus() {
   ];
   chrome.contextMenus.create({
     id: "vertalen.root",
-    title: "vertalen: translate selection",
-    contexts: ["selection"],
+    title: "vertalen",
+    contexts: ["page", "selection", "frame"],
   });
   for (const t of targets) {
     if (t.code === settings.defaultSrc) continue;
     chrome.contextMenus.create({
       id: `vertalen.translate.${t.code}`,
       parentId: "vertalen.root",
-      title: `Translate to ${t.label}`,
+      title: `Translate selection to ${t.label}`,
       contexts: ["selection"],
     });
   }
   chrome.contextMenus.create({
-    id: "vertalen.sep",
+    id: "vertalen.sepSelection",
     parentId: "vertalen.root",
     type: "separator",
     contexts: ["selection"],
   });
   chrome.contextMenus.create({
+    id: "vertalen.translatePage",
+    parentId: "vertalen.root",
+    title: "Translate this page",
+    contexts: ["page", "selection", "frame"],
+  });
+  chrome.contextMenus.create({
     id: "vertalen.openReader",
     parentId: "vertalen.root",
     title: "Open page in side-by-side reader",
-    contexts: ["selection", "page"],
+    contexts: ["page", "selection", "frame"],
   });
 }
 
@@ -175,6 +181,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (info.menuItemId === "vertalen.openReader") {
     openReader(tab.id);
+    return;
+  }
+
+  if (info.menuItemId === "vertalen.translatePage") {
+    runPageTranslate(tab.id);
     return;
   }
 
@@ -501,7 +512,13 @@ async function runPageTranslate(tabId, { src, tgt } = {}) {
   activeJobs.set(tabId, { abort });
 
   try {
-    sendProgress({ stage: "starting", src: finalSrc, tgt: finalTgt });
+    console.log("[vertalen] Translate page:", finalSrc, "→", finalTgt, "tab", tabId);
+    sendProgress({
+      stage: "starting",
+      src: finalSrc,
+      tgt: finalTgt,
+      label: `${labelForCode(finalSrc)} → ${labelForCode(finalTgt)} · scanning page…`,
+    });
 
     let nodes;
     try {
@@ -568,11 +585,17 @@ async function runPageTranslate(tabId, { src, tgt } = {}) {
       return;
     }
 
+    const ok = total - failed;
+    console.log(`[vertalen] Translate page done: ${ok}/${total} blocks (${failed} failed)`);
     sendProgress({
       stage: "done",
-      translated: total - failed,
+      translated: ok,
       total,
       failed,
+      label:
+        failed > 0
+          ? `Translated ${ok} of ${total} blocks · ${failed} failed`
+          : `Translated ${ok} blocks · ${labelForCode(finalSrc)} → ${labelForCode(finalTgt)}`,
     });
   } catch (err) {
     notifyError(err);
@@ -634,6 +657,10 @@ function maskKey(key) {
   return `${key.slice(0, 5)}…${key.slice(-4)}`;
 }
 
+function labelForCode(code) {
+  return getLanguage(code)?.name || code || "?";
+}
+
 function collectTextNodes() {
   const SKIP_TAGS = new Set([
     "SCRIPT",
@@ -655,28 +682,34 @@ function collectTextNodes() {
     "CANVAS",
   ]);
   const NODE_ATTR = "data-vertalen-node";
-  let counter = 0;
-  const collected = [];
+  const NOISE_SELECTOR =
+    "[data-vertalen-node], [data-vertalen-translated], [data-vertalen-imm-scanned], .vertalen-imm, .vertalen-root";
+
+  const candidates = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+      const trimmed = node.nodeValue.trim();
+      if (trimmed.length < 2) return NodeFilter.FILTER_REJECT;
       const parent = node.parentElement;
       if (!parent) return NodeFilter.FILTER_REJECT;
       if (SKIP_TAGS.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
-      if (parent.closest(`[${NODE_ATTR}], .vertalen-imm, .vertalen-root`)) {
-        return NodeFilter.FILTER_REJECT;
-      }
+      if (parent.closest(NOISE_SELECTOR)) return NodeFilter.FILTER_REJECT;
       if (parent.isContentEditable) return NodeFilter.FILTER_REJECT;
       if (parent.getAttribute && parent.getAttribute("translate") === "no") {
         return NodeFilter.FILTER_REJECT;
       }
-      const trimmed = node.nodeValue.trim();
-      if (trimmed.length < 2) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
   while (walker.nextNode()) {
-    const node = walker.currentNode;
+    candidates.push(walker.currentNode);
+  }
+
+  const collected = [];
+  let counter = 0;
+  for (const node of candidates) {
+    if (!node.parentNode) continue;
     const id = `vt-${counter++}`;
     const span = document.createElement("span");
     span.setAttribute(NODE_ATTR, id);
@@ -703,23 +736,89 @@ function applyTranslatedNode(id, translated) {
 function extractReadableContent() {
   const TITLE = document.title;
   const URL = location.href;
-  const SKIP_TAGS = new Set([
-    "SCRIPT",
-    "STYLE",
-    "NAV",
-    "FOOTER",
-    "ASIDE",
-    "FORM",
-    "NOSCRIPT",
-  ]);
-  const main = document.querySelector("article, main, [role=main]") || document.body;
+  const NOISE_SELECTOR =
+    "nav, footer, aside, header[role=banner], [role=navigation], [role=complementary], [aria-hidden=true], .nav, .navbar, .footer, .sidebar, .ad, .ads, .advertisement, .cookie, .cookies, .modal, .toast, .notification, .vertalen-root, [data-vertalen-node]";
+  const BLOCK_SELECTOR =
+    "h1, h2, h3, h4, h5, h6, p, li, blockquote, dt, dd, td, th, figcaption, summary, pre, article, section";
+  const seenText = new Set();
   const blocks = [];
-  for (const el of main.querySelectorAll("h1,h2,h3,h4,p,li,blockquote")) {
-    if (el.closest("nav, footer, aside")) continue;
-    if ([...el.children].some((c) => SKIP_TAGS.has(c.tagName))) continue;
-    const text = el.innerText.trim();
-    if (text.length < 4) continue;
-    blocks.push({ tag: el.tagName.toLowerCase(), text });
+
+  function pushBlock(tag, raw) {
+    if (!raw) return;
+    const text = raw.replace(/\s+/g, " ").trim();
+    if (text.length < 8) return;
+    if (seenText.has(text)) return;
+    seenText.add(text);
+    blocks.push({ tag, text });
   }
+
+  function isVisible(el) {
+    if (!(el instanceof Element)) return true;
+    const style = window.getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") return false;
+    if (parseFloat(style.opacity) === 0) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  const candidates = [];
+  const semantic = document.querySelector(
+    "article, main, [role=main], .post, .article, .entry-content, .markdown-body, #content, #main",
+  );
+  if (semantic) candidates.push(semantic);
+  candidates.push(document.body);
+
+  for (const root of candidates) {
+    if (!root) continue;
+    const found = root.querySelectorAll(BLOCK_SELECTOR);
+    for (const el of found) {
+      if (!(el instanceof Element)) continue;
+      if (el.closest(NOISE_SELECTOR)) continue;
+      if (!isVisible(el)) continue;
+      const tag = el.tagName.toLowerCase();
+      if (tag === "article" || tag === "section") {
+        if (el.querySelector(BLOCK_SELECTOR)) continue;
+      }
+      const text = el.innerText || el.textContent || "";
+      pushBlock(tag, text);
+    }
+    if (blocks.length >= 4) break;
+  }
+
+  if (blocks.length < 4) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const v = node.nodeValue;
+        if (!v || v.trim().length < 30) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        const skip = new Set([
+          "SCRIPT",
+          "STYLE",
+          "NOSCRIPT",
+          "TEMPLATE",
+          "CODE",
+          "PRE",
+          "TEXTAREA",
+          "INPUT",
+          "BUTTON",
+          "SELECT",
+          "OPTION",
+          "SVG",
+          "MATH",
+          "CANVAS",
+        ]);
+        if (skip.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
+        if (parent.closest(NOISE_SELECTOR)) return NodeFilter.FILTER_REJECT;
+        if (!isVisible(parent)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    while (walker.nextNode()) {
+      pushBlock("p", walker.currentNode.nodeValue);
+      if (blocks.length >= 200) break;
+    }
+  }
+
   return { title: TITLE, url: URL, blocks };
 }

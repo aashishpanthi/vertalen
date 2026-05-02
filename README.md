@@ -104,7 +104,7 @@ Pin the extension to your toolbar to use it everywhere.
 ### Core translation
 
 - **Selection tooltip** — highlight any text on any page, click the floating translate button (or press <kbd>Alt</kbd> + <kbd>T</kbd>) and the translation appears in a non-destructive tooltip with a copy/retry action and the option to view the original.
-- **Right-click menu** — translate selection to a specific target language without changing your default.
+- **Right-click menu** — open the **vertalen** submenu from any page. Translate the selection to a specific target language, run **Translate this page**, or **Open in side-by-side reader** without going through the popup.
 - **Full-page translate** — replaces every text node in place with a live progress bar and a Cancel button. The original text is preserved on hover via `data-vertalen-original`.
 - **Side-by-side reader** — opens the current article in a new tab with the original on the left and the translation streaming in on the right, paragraph by paragraph.
 - **Popup translator** — a quick textarea translator for ad-hoc snippets, with language picker, swap, copy, and a recent-translations history.

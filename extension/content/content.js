@@ -381,6 +381,38 @@
 .vertalen-progress--error .vertalen-progress__bar {
   background: #b91c1c;
 }
+.vertalen-progress__actions {
+  display: flex;
+  gap: 0.4rem;
+  padding-top: 0.25rem;
+}
+.vertalen-progress__actions[hidden] {
+  display: none;
+}
+.vertalen-progress__actions button {
+  flex: 1 1 auto;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 31, 46, 0.12);
+  background: #ffffff;
+  color: #1a1f2e;
+  cursor: pointer;
+  font: 600 0.75rem/1 inherit;
+}
+.vertalen-progress__restore {
+  border-color: #003893 !important;
+  background: #003893 !important;
+  color: #ffffff !important;
+}
+.vertalen-progress__restore:hover {
+  background: #002766 !important;
+  border-color: #002766 !important;
+}
+.vertalen-progress__dismiss:hover {
+  background: rgba(220, 20, 60, 0.08);
+  color: #dc143c;
+  border-color: #dc143c;
+}
 .vertalen-imm-pop {
   width: clamp(220px, min(24vw, 100vw - 24px), 320px);
   max-width: calc(100vw - 24px);
@@ -799,21 +831,30 @@
   function handlePageProgress(message) {
     const stage = message.stage;
     if (stage === "starting") {
-      showProgress({ translated: 0, total: 0, label: "Preparing…" });
+      showProgress({
+        translated: 0,
+        total: 0,
+        label: message.label || "Preparing translation…",
+      });
     } else if (stage === "progress") {
       showProgress({
         translated: message.translated,
         total: message.total,
-        label: `Translating ${message.translated}/${message.total}`,
+        label:
+          message.label ||
+          `Translating ${message.translated}/${message.total}`,
       });
     } else if (stage === "done") {
       showProgress({
         translated: message.translated,
         total: message.total,
-        label: `Done — ${message.translated} blocks translated.`,
+        label:
+          message.label ||
+          `Done — ${message.translated} blocks translated.`,
         finished: true,
+        showRestore: true,
       });
-      setTimeout(hideProgress, 4000);
+      setTimeout(hideProgress, 8000);
     } else if (stage === "error") {
       showProgress({
         translated: 0,
@@ -821,7 +862,7 @@
         label: message.error || "Translation failed.",
         error: true,
       });
-      setTimeout(hideProgress, 6000);
+      setTimeout(hideProgress, 8000);
     }
   }
 
@@ -1376,11 +1417,15 @@
     bar.className = "vertalen-progress";
     bar.innerHTML = `
       <div class="vertalen-progress__head">
-        <span class="vertalen-progress__title">vertalen</span>
+        <span class="vertalen-progress__title">vertalen · translate page</span>
         <button class="vertalen-progress__cancel" type="button">Cancel</button>
       </div>
       <div class="vertalen-progress__label"></div>
       <div class="vertalen-progress__track"><div class="vertalen-progress__bar"></div></div>
+      <div class="vertalen-progress__actions" hidden>
+        <button class="vertalen-progress__restore" type="button">Restore original</button>
+        <button class="vertalen-progress__dismiss" type="button">Dismiss</button>
+      </div>
     `;
     shadow.appendChild(bar);
     host.style.left = "auto";
@@ -1391,15 +1436,41 @@
       safeSendMessage({ type: "vertalen/cancel_page" });
       hideProgress();
     });
+    bar.querySelector(".vertalen-progress__dismiss").addEventListener("click", hideProgress);
+    bar.querySelector(".vertalen-progress__restore").addEventListener("click", () => {
+      restorePageTranslations();
+      hideProgress();
+    });
 
-    function set({ translated = 0, total = 0, label = "", finished, error }) {
+    function set({ translated = 0, total = 0, label = "", finished, error, showRestore }) {
       bar.querySelector(".vertalen-progress__label").textContent = label;
       const pct = total ? Math.min(100, Math.round((translated / total) * 100)) : finished ? 100 : 5;
       bar.querySelector(".vertalen-progress__bar").style.width = `${pct}%`;
       bar.classList.toggle("vertalen-progress--done", Boolean(finished));
       bar.classList.toggle("vertalen-progress--error", Boolean(error));
+      const cancelBtn = bar.querySelector(".vertalen-progress__cancel");
+      cancelBtn.style.display = finished || error ? "none" : "";
+      const actions = bar.querySelector(".vertalen-progress__actions");
+      actions.hidden = !(showRestore || error);
+      bar.querySelector(".vertalen-progress__restore").style.display = showRestore
+        ? ""
+        : "none";
     }
 
     return { host, shadow, set };
+  }
+
+  function restorePageTranslations() {
+    const nodes = document.querySelectorAll("[data-vertalen-node][data-vertalen-translated]");
+    let restored = 0;
+    for (const el of nodes) {
+      const orig = el.getAttribute("data-vertalen-original");
+      if (orig != null) {
+        el.textContent = orig;
+        el.removeAttribute("data-vertalen-translated");
+        restored += 1;
+      }
+    }
+    console.log(`[vertalen] Restored ${restored} blocks to original.`);
   }
 })();

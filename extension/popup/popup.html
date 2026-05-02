@@ -33,17 +33,27 @@
 
       <section
         id="warningKey"
-        class="warning"
+        class="warning warning--inline"
         hidden
         role="alert"
         aria-live="polite"
       >
-        <strong>TMT token needed for translation.</strong>
-        <span
-          >Add your TMT API token to translate selections and pages. Learn /
-          immersion uses built-in vocabulary and works without a token.</span
-        >
-        <button class="warning__btn" id="warningOpenOptions">Add key</button>
+        <strong class="warning__title">Add your TMT token to translate.</strong>
+        <form id="quickKeyForm" class="warning__form">
+          <input
+            id="quickKey"
+            type="password"
+            placeholder="team_xxxxxxxxxxxxxxxx"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="TMT API token"
+          />
+          <button type="submit" class="warning__btn" id="quickKeySave">Save</button>
+        </form>
+        <span class="warning__hint" id="quickKeyHint" hidden></span>
+        <button class="warning__link" id="warningOpenOptions" type="button">
+          Open settings →
+        </button>
       </section>
 
       <nav class="tabs" role="tablist" aria-label="Mode">
@@ -70,10 +80,6 @@
       </nav>
 
       <div id="paneTranslate" role="tabpanel" aria-labelledby="tabTranslate" class="pane">
-      <p class="pane__intro">
-        On-demand translation. Convert selected text or a whole page on
-        request. <strong>Uses your TMT API token.</strong>
-      </p>
       <section class="lang-row" aria-label="Language picker">
         <label class="lang">
           <span class="lang__label">From</span>
@@ -165,12 +171,6 @@
       </div><!-- /paneTranslate -->
 
       <div id="paneLearn" role="tabpanel" aria-labelledby="tabLearn" class="pane" hidden>
-        <p class="pane__intro">
-          Learn Nepali or Tamang while you read the web. Random English words
-          turn into your target language. <strong>No API token needed</strong> —
-          uses built-in vocabulary.
-        </p>
-
         <section class="toggle-card" id="immersionToggleCard">
           <div class="toggle-card__body">
             <strong class="toggle-card__title">Immersion mode</strong>

@@ -19,6 +19,10 @@ const els = {
   openOptions: document.getElementById("openOptions"),
   warningKey: document.getElementById("warningKey"),
   warningOpenOptions: document.getElementById("warningOpenOptions"),
+  quickKeyForm: document.getElementById("quickKeyForm"),
+  quickKey: document.getElementById("quickKey"),
+  quickKeySave: document.getElementById("quickKeySave"),
+  quickKeyHint: document.getElementById("quickKeyHint"),
   history: document.getElementById("historyList"),
   historyEmpty: document.getElementById("historyEmpty"),
   clearHistory: document.getElementById("clearHistory"),
@@ -108,12 +112,45 @@ function bindEvents() {
   els.quizSkip.addEventListener("click", () => loadQuiz());
   els.quizNew.addEventListener("click", () => loadQuiz());
   els.learnSettings.addEventListener("click", openOptions);
+  els.quickKeyForm.addEventListener("submit", onQuickKeySave);
 
   chrome.storage?.onChanged?.addListener((changes, area) => {
     if (area !== "local") return;
     if (changes.apiKey) checkApiKey();
     if (changes.settings) loadSettings();
   });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) checkApiKey();
+  });
+  window.addEventListener("focus", checkApiKey);
+}
+
+async function onQuickKeySave(e) {
+  e.preventDefault();
+  const value = (els.quickKey.value || "").trim();
+  if (!value) {
+    showQuickKeyHint("Paste your token first.", "err");
+    return;
+  }
+  try {
+    els.quickKeySave.disabled = true;
+    showQuickKeyHint("Saving…", "busy");
+    await Storage.setApiKey(value);
+    els.quickKey.value = "";
+    showQuickKeyHint("Saved.", "ok");
+    await checkApiKey();
+  } catch (err) {
+    showQuickKeyHint(err?.message || "Could not save.", "err");
+  } finally {
+    els.quickKeySave.disabled = false;
+  }
+}
+
+function showQuickKeyHint(text, tone) {
+  els.quickKeyHint.textContent = text;
+  els.quickKeyHint.dataset.tone = tone || "";
+  els.quickKeyHint.hidden = !text;
 }
 
 function switchTab(name) {

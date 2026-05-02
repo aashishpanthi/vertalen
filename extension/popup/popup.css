@@ -41,6 +41,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;
@@ -154,6 +158,79 @@ body {
 }
 .warning__btn:hover {
   background: var(--accent-strong);
+}
+
+.warning--inline {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.warning--inline .warning__title {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.warning__form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem;
+}
+
+.warning__form input {
+  min-width: 0;
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(220, 20, 60, 0.3);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.warning__form input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.warning--inline .warning__btn {
+  grid-column: auto;
+  grid-row: auto;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+.warning__hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.warning__hint[data-tone="ok"] {
+  color: var(--success);
+}
+
+.warning__hint[data-tone="err"] {
+  color: var(--error);
+}
+
+.warning__link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  justify-self: start;
+}
+
+.warning__link:hover {
+  color: var(--accent-strong);
 }
 
 .lang-row {
@@ -484,30 +561,6 @@ body {
 .pane {
   display: grid;
   gap: 0.85rem;
-}
-
-.pane__intro {
-  margin: 0;
-  padding: 0.6rem 0.75rem;
-  background: var(--accent-soft);
-  border: 1px solid rgba(220, 20, 60, 0.18);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
-#paneLearn .pane__intro {
-  background: var(--secondary-soft);
-  border-color: rgba(0, 56, 147, 0.22);
-}
-
-.pane__intro strong {
-  color: var(--accent-strong);
-}
-
-#paneLearn .pane__intro strong {
-  color: var(--secondary-strong);
 }
 
 .toggle-card {
