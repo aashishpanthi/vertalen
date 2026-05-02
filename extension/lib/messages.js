@@ -1,0 +1,30 @@
+/**
+ * Centralized message-type constants for runtime communication
+ * between the service worker, content scripts, and extension pages.
+ *
+ * Using string constants here (instead of enums) keeps the lib usable
+ * from both ES module and content-script contexts.
+ */
+
+export const MSG = Object.freeze({
+  TRANSLATE_TEXT: "vertalen/translate_text",
+  TRANSLATE_BATCH: "vertalen/translate_batch",
+  TRANSLATE_PAGE: "vertalen/translate_page",
+  CANCEL_PAGE: "vertalen/cancel_page",
+  PAGE_PROGRESS: "vertalen/page_progress",
+  OPEN_READER: "vertalen/open_reader",
+  GET_SETTINGS: "vertalen/get_settings",
+  SET_SETTINGS: "vertalen/set_settings",
+  GET_API_STATUS: "vertalen/get_api_status",
+  GET_HISTORY: "vertalen/get_history",
+  CLEAR_HISTORY: "vertalen/clear_history",
+  EXPORT_TM: "vertalen/export_tm",
+  PING: "vertalen/ping",
+
+  IMMERSION_BOOTSTRAP: "vertalen/immersion_bootstrap",
+  IMMERSION_RECORD: "vertalen/immersion_record",
+  IMMERSION_STATS: "vertalen/immersion_stats",
+  IMMERSION_RESET: "vertalen/immersion_reset",
+  LEARN_QUIZ_DRAW: "vertalen/learn_quiz_draw",
+  LEARN_QUIZ_ANSWER: "vertalen/learn_quiz_answer",
+});

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>vertalen — Side-by-side reader</title>
+    <link rel="stylesheet" href="reader.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__brand">
+        <img src="../icons/icon48.png" alt="" />
+        <div>
+          <h1 id="docTitle">Loading…</h1>
+          <p>
+            <a id="docUrl" href="#" target="_blank" rel="noreferrer"></a>
+          </p>
+        </div>
+      </div>
+      <div class="topbar__controls">
+        <label class="control">
+          <span>From</span>
+          <select id="srcLang">
+            <option value="eng">English</option>
+            <option value="nep">Nepali</option>
+            <option value="tmg">Tamang</option>
+          </select>
+        </label>
+        <label class="control">
+          <span>To</span>
+          <select id="tgtLang">
+            <option value="nep">Nepali</option>
+            <option value="eng">English</option>
+            <option value="tmg">Tamang</option>
+          </select>
+        </label>
+        <button id="run" class="btn btn--primary">Translate</button>
+        <button id="cancel" class="btn" disabled>Stop</button>
+      </div>
+    </header>
+
+    <section class="progress" id="progress" hidden>
+      <span id="progressLabel">Working…</span>
+      <div class="progress__bar"><div id="progressFill"></div></div>
+    </section>
+
+    <main class="reader" aria-label="Translated content">
+      <article class="column">
+        <header class="column__header">
+          <h2>Original</h2>
+          <span id="origLang">—</span>
+        </header>
+        <div id="originalCol" class="column__body"></div>
+      </article>
+      <article class="column">
+        <header class="column__header">
+          <h2>Translation</h2>
+          <span id="targetLang">—</span>
+        </header>
+        <div id="translatedCol" class="column__body"></div>
+      </article>
+    </main>
+
+    <footer class="legal">
+      <p>
+        Translated with the
+        <a href="https://tmt.ilprl.ku.edu.np/" target="_blank" rel="noreferrer">
+          Google TMT</a> system.
+      </p>
+    </footer>
+
+    <script type="module" src="reader.js"></script>
+  </body>
+</html>

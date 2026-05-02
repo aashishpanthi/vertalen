@@ -1,0 +1,88 @@
+{
+  "manifest_version": 3,
+  "name": "vertalen",
+  "version": "1.0.0",
+  "description": "Translate any web page or selection between English, Nepali, and Tamang. Powered by the Google TMT API.",
+  "author": "Aashish Panthi",
+  "homepage_url": "https://github.com/aashishpanthi/vertalen",
+  "minimum_chrome_version": "114",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "notifications",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://tmt.ilprl.ku.edu.np/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "*://*/*.pdf",
+        "*://*/*.json"
+      ],
+      "js": ["content/content.js"],
+      "css": ["content/tooltip.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "vertalen — Translate this page",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "translate-selection": {
+      "suggested_key": {
+        "default": "Alt+T",
+        "mac": "Alt+T"
+      },
+      "description": "Translate the currently selected text"
+    },
+    "translate-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+T",
+        "mac": "Alt+Shift+T"
+      },
+      "description": "Translate the entire current page"
+    },
+    "swap-languages": {
+      "suggested_key": {
+        "default": "Alt+S",
+        "mac": "Alt+S"
+      },
+      "description": "Swap source and target languages"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "onboarding/welcome.html",
+        "reader/reader.html",
+        "icons/*.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

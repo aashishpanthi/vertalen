@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to vertalen</title>
+    <link rel="stylesheet" href="welcome.css" />
+  </head>
+  <body>
+    <main class="welcome">
+      <header class="hero">
+        <img class="hero__logo" src="../icons/icon128.png" alt="" />
+        <div>
+          <h1 class="hero__title">Welcome to vertalen</h1>
+          <p class="hero__sub">
+            Translate any web page or selection between
+            <strong>English</strong>, <strong>Nepali</strong>, and
+            <strong>Tamang</strong> — powered by the Google TMT API.
+          </p>
+        </div>
+      </header>
+
+      <ol class="steps">
+        <li class="step" data-step="1">
+          <header class="step__head">
+            <span class="step__num">1</span>
+            <h2>Add your TMT API key</h2>
+          </header>
+          <div class="step__body">
+            <p>
+              vertalen needs your team token to translate. Your token was sent
+              to the team leader's email address by the TMT organizing team.
+            </p>
+            <form class="key-form" id="keyForm">
+              <input
+                id="apiKey"
+                type="password"
+                placeholder="team_xxxxxxxxxxxxxxxx"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="btn btn--primary" id="saveKey">Save key</button>
+            </form>
+            <p class="key-form__status" id="keyStatus" aria-live="polite"></p>
+          </div>
+        </li>
+
+        <li class="step" data-step="2">
+          <header class="step__head">
+            <span class="step__num">2</span>
+            <h2>Try a sample translation</h2>
+          </header>
+          <div class="step__body">
+            <div class="sample">
+              <label class="sample__lang">
+                <span>From</span>
+                <select id="sampleSrc">
+                  <option value="eng">English</option>
+                  <option value="nep">Nepali</option>
+                  <option value="tmg">Tamang</option>
+                </select>
+              </label>
+              <label class="sample__lang">
+                <span>To</span>
+                <select id="sampleTgt">
+                  <option value="nep">Nepali</option>
+                  <option value="eng">English</option>
+                  <option value="tmg">Tamang</option>
+                </select>
+              </label>
+            </div>
+            <textarea
+              id="sampleInput"
+              rows="3"
+              placeholder="Type something to test the connection…"
+            ></textarea>
+            <button class="btn btn--primary" id="sampleRun" disabled>
+              Translate
+            </button>
+            <div class="sample__output" id="sampleOutput" aria-live="polite">
+              Your translation will appear here.
+            </div>
+          </div>
+        </li>
+
+        <li class="step" data-step="3">
+          <header class="step__head">
+            <span class="step__num">3</span>
+            <h2>Learn the gestures</h2>
+          </header>
+          <div class="step__body grid-cards">
+            <div class="card">
+              <div class="card__glyph" aria-hidden="true">🖱️</div>
+              <h3>Select text</h3>
+              <p>
+                Highlight any phrase on a web page and click the floating
+                <strong>Translate</strong> button.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card__glyph" aria-hidden="true">⌨️</div>
+              <h3>Use shortcuts</h3>
+              <p>
+                <kbd>Alt</kbd> + <kbd>T</kbd> translates a selection.
+                <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> translates the
+                whole page.
+              </p>
+            </div>
+            <div class="card">
+              <div class="card__glyph" aria-hidden="true">📰</div>
+              <h3>Reader mode</h3>
+              <p>
+                Open the popup and choose
+                <strong>Open in side-by-side reader</strong> for long articles.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="step" data-step="4">
+          <header class="step__head">
+            <span class="step__num">4</span>
+            <h2>Want to learn while you browse?</h2>
+          </header>
+          <div class="step__body">
+            <p>
+              Immersion mode sprinkles
+              <strong>Tamang</strong> or <strong>Nepali</strong>
+              vocabulary into the English pages you read. Hover any
+              translated word to see the original, click for actions, and
+              quiz yourself in the popup. It's an opt-in way to support
+              language preservation just by browsing the way you already do.
+            </p>
+            <form class="immersion-form" id="immersionForm">
+              <label class="immersion-toggle">
+                <input type="checkbox" id="immersionToggle" />
+                <span>Yes, turn on immersion mode</span>
+              </label>
+              <div class="immersion-grid">
+                <label class="immersion-field">
+                  <span>Learning</span>
+                  <select id="immersionTargetSel">
+                    <option value="tmg">Tamang (recommended)</option>
+                    <option value="nep">Nepali</option>
+                  </select>
+                </label>
+                <label class="immersion-field">
+                  <span>Daily goal</span>
+                  <input
+                    type="number"
+                    id="immersionGoalInp"
+                    min="1"
+                    max="50"
+                    value="5"
+                  />
+                </label>
+              </div>
+              <p class="immersion-hint">
+                You can change this any time from the popup or Settings.
+              </p>
+            </form>
+          </div>
+        </li>
+
+        <li class="step" data-step="5">
+          <header class="step__head">
+            <span class="step__num">5</span>
+            <h2>You're all set</h2>
+          </header>
+          <div class="step__body">
+            <p>
+              Pin the vertalen icon to your Chrome toolbar to keep it
+              one click away. You can revisit any of these settings later
+              from the Options page.
+            </p>
+            <div class="footer-actions">
+              <a class="btn btn--primary" id="finish" href="#">Open settings</a>
+              <a class="btn btn--ghost" href="https://tmt.ilprl.ku.edu.np/" target="_blank" rel="noreferrer">
+                About TMT
+              </a>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </main>
+
+    <script type="module" src="welcome.js"></script>
+  </body>
+</html>

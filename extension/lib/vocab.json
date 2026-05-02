@@ -1,0 +1,1626 @@
+[
+  {
+    "en": "hello",
+    "category": "greetings",
+    "level": 1,
+    "ne": "हेलो हेलो",
+    "tmg": "ल्होलो ल्होलो",
+    "flagged": false
+  },
+  {
+    "en": "goodbye",
+    "category": "greetings",
+    "level": 1,
+    "ne": "अलविदा",
+    "tmg": "बिदाइ बिदाइ",
+    "flagged": false
+  },
+  {
+    "en": "thank you",
+    "category": "greetings",
+    "level": 1,
+    "ne": "धन्यवाद छ।",
+    "tmg": "थुजेछे लास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "please",
+    "category": "greetings",
+    "level": 1,
+    "ne": "कृपया",
+    "tmg": "प्लिस्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "sorry",
+    "category": "greetings",
+    "level": 1,
+    "ne": "क्षमा गर्नुहोला",
+    "tmg": "माफ लास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "yes",
+    "category": "greetings",
+    "level": 1,
+    "ne": "हो हो",
+    "tmg": "हिन्ना",
+    "flagged": false
+  },
+  {
+    "en": "no",
+    "category": "greetings",
+    "level": 1,
+    "ne": "होइन।",
+    "tmg": "आहिन",
+    "flagged": false
+  },
+  {
+    "en": "welcome",
+    "category": "greetings",
+    "level": 1,
+    "ne": "स्वागत छ।",
+    "tmg": "डेन लास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "okay",
+    "category": "greetings",
+    "level": 1,
+    "ne": "ठीक छ।",
+    "tmg": "ओके ओके",
+    "flagged": false
+  },
+  {
+    "en": "friend",
+    "category": "greetings",
+    "level": 1,
+    "ne": "साथीभाइ",
+    "tmg": "ह्रोला",
+    "flagged": false
+  },
+  {
+    "en": "good morning",
+    "category": "greetings",
+    "level": 1,
+    "ne": "शुभ प्रभात",
+    "tmg": "ज्याबा स्ह्यो",
+    "flagged": false
+  },
+  {
+    "en": "good night",
+    "category": "greetings",
+    "level": 1,
+    "ne": "गुड नाइट",
+    "tmg": "ज्याबा म्हुना",
+    "flagged": false
+  },
+  {
+    "en": "I",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "म",
+    "tmg": "ङा",
+    "flagged": false
+  },
+  {
+    "en": "you",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "तिमी",
+    "tmg": "एदा",
+    "flagged": false
+  },
+  {
+    "en": "he",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "ऊ",
+    "tmg": "थेसे",
+    "flagged": false
+  },
+  {
+    "en": "she",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "ऊ",
+    "tmg": "थेसे",
+    "flagged": false
+  },
+  {
+    "en": "we",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "हामी",
+    "tmg": "ङानि",
+    "flagged": false
+  },
+  {
+    "en": "they",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "उनीहरू",
+    "tmg": "थेनिकादे",
+    "flagged": false
+  },
+  {
+    "en": "this",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "यो",
+    "tmg": "चु चु",
+    "flagged": false
+  },
+  {
+    "en": "that",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "त्यो",
+    "tmg": "थेला",
+    "flagged": false
+  },
+  {
+    "en": "who",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "जो",
+    "tmg": "खाला खाला",
+    "flagged": false
+  },
+  {
+    "en": "what",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "के के",
+    "tmg": "तिगा तिगा",
+    "flagged": false
+  },
+  {
+    "en": "where",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "जहाँ",
+    "tmg": "खानाङ",
+    "flagged": false
+  },
+  {
+    "en": "when",
+    "category": "pronoun",
+    "level": 1,
+    "ne": "जब",
+    "tmg": "खाइमा",
+    "flagged": false
+  },
+  {
+    "en": "one",
+    "category": "number",
+    "level": 1,
+    "ne": "एकजना",
+    "tmg": "याक्खार्गि",
+    "flagged": false
+  },
+  {
+    "en": "two",
+    "category": "number",
+    "level": 1,
+    "ne": "दुई जना",
+    "tmg": "ङि ङि",
+    "flagged": false
+  },
+  {
+    "en": "three",
+    "category": "number",
+    "level": 1,
+    "ne": "तीनवटा",
+    "tmg": "गोरसोम",
+    "flagged": false
+  },
+  {
+    "en": "four",
+    "category": "number",
+    "level": 1,
+    "ne": "चारवटा",
+    "tmg": "ब्लि",
+    "flagged": false
+  },
+  {
+    "en": "five",
+    "category": "number",
+    "level": 1,
+    "ne": "पाँचवटा",
+    "tmg": "ङा ङा",
+    "flagged": false
+  },
+  {
+    "en": "six",
+    "category": "number",
+    "level": 1,
+    "ne": "छ वटा",
+    "tmg": "डु डु",
+    "flagged": false
+  },
+  {
+    "en": "seven",
+    "category": "number",
+    "level": 1,
+    "ne": "सातवटा",
+    "tmg": "निस",
+    "flagged": false
+  },
+  {
+    "en": "eight",
+    "category": "number",
+    "level": 1,
+    "ne": "आठवटा",
+    "tmg": "ब्रात",
+    "flagged": false
+  },
+  {
+    "en": "nine",
+    "category": "number",
+    "level": 1,
+    "ne": "नौवटा",
+    "tmg": "कुः",
+    "flagged": false
+  },
+  {
+    "en": "ten",
+    "category": "number",
+    "level": 1,
+    "ne": "दश जना",
+    "tmg": "च्युइ",
+    "flagged": false
+  },
+  {
+    "en": "twenty",
+    "category": "number",
+    "level": 2,
+    "ne": "बाह्रौँ",
+    "tmg": "न्हिच्युइ",
+    "flagged": false
+  },
+  {
+    "en": "fifty",
+    "category": "number",
+    "level": 2,
+    "ne": "पचास",
+    "tmg": "ङाच्युइ",
+    "flagged": false
+  },
+  {
+    "en": "hundred",
+    "category": "number",
+    "level": 2,
+    "ne": "सयौँ",
+    "tmg": "ग्यार्जा गिक",
+    "flagged": false
+  },
+  {
+    "en": "first",
+    "category": "number",
+    "level": 2,
+    "ne": "पहिलो",
+    "tmg": "गिक्छा",
+    "flagged": false
+  },
+  {
+    "en": "last",
+    "category": "number",
+    "level": 2,
+    "ne": "अन्तिम",
+    "tmg": "लिच्छाला",
+    "flagged": false
+  },
+  {
+    "en": "today",
+    "category": "time",
+    "level": 1,
+    "ne": "आजभोलि",
+    "tmg": "तिनि",
+    "flagged": false
+  },
+  {
+    "en": "tomorrow",
+    "category": "time",
+    "level": 1,
+    "ne": "भोलिपल्ट",
+    "tmg": "न्हाङ्गार",
+    "flagged": false
+  },
+  {
+    "en": "yesterday",
+    "category": "time",
+    "level": 1,
+    "ne": "हिजो",
+    "tmg": "तिल्मा",
+    "flagged": false
+  },
+  {
+    "en": "morning",
+    "category": "time",
+    "level": 1,
+    "ne": "बिहानको बिहान",
+    "tmg": "स्ह्योरि",
+    "flagged": false
+  },
+  {
+    "en": "evening",
+    "category": "time",
+    "level": 1,
+    "ne": "बेलुका",
+    "tmg": "ङ्यासे ङ्यासे",
+    "flagged": false
+  },
+  {
+    "en": "night",
+    "category": "time",
+    "level": 1,
+    "ne": "राती राती",
+    "tmg": "म्हुना",
+    "flagged": false
+  },
+  {
+    "en": "day",
+    "category": "time",
+    "level": 1,
+    "ne": "दिउँसो",
+    "tmg": "रेला रे",
+    "flagged": false
+  },
+  {
+    "en": "week",
+    "category": "time",
+    "level": 1,
+    "ne": "साता",
+    "tmg": "निसरे",
+    "flagged": false
+  },
+  {
+    "en": "month",
+    "category": "time",
+    "level": 1,
+    "ne": "महिना",
+    "tmg": "ला गिक",
+    "flagged": false
+  },
+  {
+    "en": "year",
+    "category": "time",
+    "level": 1,
+    "ne": "वर्ष",
+    "tmg": "दिङ",
+    "flagged": false
+  },
+  {
+    "en": "hour",
+    "category": "time",
+    "level": 2,
+    "ne": "घन्टा",
+    "tmg": "घन्टा गिक",
+    "flagged": false
+  },
+  {
+    "en": "minute",
+    "category": "time",
+    "level": 2,
+    "ne": "मिनेट",
+    "tmg": "मिनेट गिक",
+    "flagged": false
+  },
+  {
+    "en": "now",
+    "category": "time",
+    "level": 1,
+    "ne": "अहिले",
+    "tmg": "दारेम",
+    "flagged": false
+  },
+  {
+    "en": "later",
+    "category": "time",
+    "level": 2,
+    "ne": "पछिपछि",
+    "tmg": "लिच्छाला दुइ",
+    "flagged": false
+  },
+  {
+    "en": "soon",
+    "category": "time",
+    "level": 2,
+    "ne": "छिट्टै",
+    "tmg": "योनान",
+    "flagged": false
+  },
+  {
+    "en": "mother",
+    "category": "family",
+    "level": 1,
+    "ne": "आमा",
+    "tmg": "आमा",
+    "flagged": false
+  },
+  {
+    "en": "father",
+    "category": "family",
+    "level": 1,
+    "ne": "बुबा",
+    "tmg": "आपासे",
+    "flagged": false
+  },
+  {
+    "en": "brother",
+    "category": "family",
+    "level": 1,
+    "ne": "दाजुभाइ",
+    "tmg": "ज्योज्यो",
+    "flagged": false
+  },
+  {
+    "en": "sister",
+    "category": "family",
+    "level": 1,
+    "ne": "बहिनी",
+    "tmg": "आङा आङा",
+    "flagged": false
+  },
+  {
+    "en": "son",
+    "category": "family",
+    "level": 1,
+    "ne": "छोरा",
+    "tmg": "जा जा",
+    "flagged": false
+  },
+  {
+    "en": "daughter",
+    "category": "family",
+    "level": 1,
+    "ne": "छोरी",
+    "tmg": "जामे",
+    "flagged": false
+  },
+  {
+    "en": "family",
+    "category": "family",
+    "level": 1,
+    "ne": "परिवार",
+    "tmg": "दिमथेमे",
+    "flagged": false
+  },
+  {
+    "en": "child",
+    "category": "family",
+    "level": 1,
+    "ne": "बच्चा",
+    "tmg": "कोला",
+    "flagged": false
+  },
+  {
+    "en": "baby",
+    "category": "family",
+    "level": 1,
+    "ne": "बच्चा",
+    "tmg": "कोला",
+    "flagged": false
+  },
+  {
+    "en": "husband",
+    "category": "family",
+    "level": 2,
+    "ne": "श्रीमान्",
+    "tmg": "ह्रेम्बा",
+    "flagged": false
+  },
+  {
+    "en": "wife",
+    "category": "family",
+    "level": 2,
+    "ne": "श्रीमती",
+    "tmg": "म्रिङ",
+    "flagged": false
+  },
+  {
+    "en": "man",
+    "category": "family",
+    "level": 1,
+    "ne": "मान्छे",
+    "tmg": "म्हि",
+    "flagged": false
+  },
+  {
+    "en": "woman",
+    "category": "family",
+    "level": 1,
+    "ne": "महिला",
+    "tmg": "म्रिङ्मा",
+    "flagged": false
+  },
+  {
+    "en": "head",
+    "category": "body",
+    "level": 1,
+    "ne": "टाउको टाउको",
+    "tmg": "थोबो",
+    "flagged": false
+  },
+  {
+    "en": "eye",
+    "category": "body",
+    "level": 1,
+    "ne": "आँखा",
+    "tmg": "मिः",
+    "flagged": false
+  },
+  {
+    "en": "ear",
+    "category": "body",
+    "level": 1,
+    "ne": "कान",
+    "tmg": "नाब्याङ",
+    "flagged": false
+  },
+  {
+    "en": "mouth",
+    "category": "body",
+    "level": 1,
+    "ne": "मुख",
+    "tmg": "सुङ",
+    "flagged": false
+  },
+  {
+    "en": "nose",
+    "category": "body",
+    "level": 1,
+    "ne": "नाक",
+    "tmg": "नार्तु",
+    "flagged": false
+  },
+  {
+    "en": "hand",
+    "category": "body",
+    "level": 1,
+    "ne": "हात",
+    "tmg": "या",
+    "flagged": false
+  },
+  {
+    "en": "foot",
+    "category": "body",
+    "level": 1,
+    "ne": "खुट्टा",
+    "tmg": "काङ",
+    "flagged": false
+  },
+  {
+    "en": "heart",
+    "category": "body",
+    "level": 1,
+    "ne": "मुटु",
+    "tmg": "तिङ",
+    "flagged": false
+  },
+  {
+    "en": "hair",
+    "category": "body",
+    "level": 1,
+    "ne": "कपाल",
+    "tmg": "क्रा",
+    "flagged": false
+  },
+  {
+    "en": "face",
+    "category": "body",
+    "level": 1,
+    "ne": "अनुहार",
+    "tmg": "लिः",
+    "flagged": false
+  },
+  {
+    "en": "water",
+    "category": "food",
+    "level": 1,
+    "ne": "पानी",
+    "tmg": "क्युइ",
+    "flagged": false
+  },
+  {
+    "en": "rice",
+    "category": "food",
+    "level": 1,
+    "ne": "धान",
+    "tmg": "म्ला",
+    "flagged": false
+  },
+  {
+    "en": "bread",
+    "category": "food",
+    "level": 1,
+    "ne": "रोटी",
+    "tmg": "गेङ",
+    "flagged": false
+  },
+  {
+    "en": "milk",
+    "category": "food",
+    "level": 1,
+    "ne": "दूध दूध",
+    "tmg": "ङ्हे ङ्हे",
+    "flagged": false
+  },
+  {
+    "en": "tea",
+    "category": "food",
+    "level": 1,
+    "ne": "चिया",
+    "tmg": "च्या",
+    "flagged": false
+  },
+  {
+    "en": "coffee",
+    "category": "food",
+    "level": 1,
+    "ne": "कफी",
+    "tmg": "कफी",
+    "flagged": false
+  },
+  {
+    "en": "food",
+    "category": "food",
+    "level": 1,
+    "ne": "खाना",
+    "tmg": "चाबास्हे",
+    "flagged": false
+  },
+  {
+    "en": "sugar",
+    "category": "food",
+    "level": 2,
+    "ne": "चिनी",
+    "tmg": "चिनी",
+    "flagged": false
+  },
+  {
+    "en": "salt",
+    "category": "food",
+    "level": 2,
+    "ne": "नुन",
+    "tmg": "चाजा",
+    "flagged": false
+  },
+  {
+    "en": "oil",
+    "category": "food",
+    "level": 2,
+    "ne": "तेल",
+    "tmg": "छ्युगु",
+    "flagged": false
+  },
+  {
+    "en": "vegetable",
+    "category": "food",
+    "level": 2,
+    "ne": "सागसब्जी",
+    "tmg": "डापडुप",
+    "flagged": false
+  },
+  {
+    "en": "fruit",
+    "category": "food",
+    "level": 2,
+    "ne": "फलफूल",
+    "tmg": "रोरो",
+    "flagged": false
+  },
+  {
+    "en": "egg",
+    "category": "food",
+    "level": 1,
+    "ne": "अण्डा",
+    "tmg": "फुम",
+    "flagged": false
+  },
+  {
+    "en": "fish",
+    "category": "food",
+    "level": 1,
+    "ne": "माछामाछा",
+    "tmg": "तार्ङा",
+    "flagged": false
+  },
+  {
+    "en": "chicken",
+    "category": "food",
+    "level": 1,
+    "ne": "कुखुराको कुखुरा",
+    "tmg": "नाका",
+    "flagged": false
+  },
+  {
+    "en": "apple",
+    "category": "food",
+    "level": 1,
+    "ne": "स्याउ",
+    "tmg": "स्याउ",
+    "flagged": false
+  },
+  {
+    "en": "banana",
+    "category": "food",
+    "level": 1,
+    "ne": "केरा",
+    "tmg": "मोजे",
+    "flagged": false
+  },
+  {
+    "en": "mango",
+    "category": "food",
+    "level": 1,
+    "ne": "आँप",
+    "tmg": "आम्बा",
+    "flagged": false
+  },
+  {
+    "en": "potato",
+    "category": "food",
+    "level": 2,
+    "ne": "आलु",
+    "tmg": "तेमे",
+    "flagged": false
+  },
+  {
+    "en": "house",
+    "category": "house",
+    "level": 1,
+    "ne": "घरघर",
+    "tmg": "दिम",
+    "flagged": false
+  },
+  {
+    "en": "door",
+    "category": "house",
+    "level": 1,
+    "ne": "ढोका",
+    "tmg": "म्राप",
+    "flagged": false
+  },
+  {
+    "en": "window",
+    "category": "house",
+    "level": 1,
+    "ne": "झ्याल",
+    "tmg": "झ्याल",
+    "flagged": false
+  },
+  {
+    "en": "room",
+    "category": "house",
+    "level": 1,
+    "ne": "कोठा",
+    "tmg": "कोठा",
+    "flagged": false
+  },
+  {
+    "en": "bed",
+    "category": "house",
+    "level": 1,
+    "ne": "ओछ्यान",
+    "tmg": "तिख्याङ",
+    "flagged": false
+  },
+  {
+    "en": "table",
+    "category": "house",
+    "level": 1,
+    "ne": "टेबुल",
+    "tmg": "टेबुल",
+    "flagged": false
+  },
+  {
+    "en": "chair",
+    "category": "house",
+    "level": 1,
+    "ne": "कुर्सी",
+    "tmg": "कुर्सी",
+    "flagged": false
+  },
+  {
+    "en": "kitchen",
+    "category": "house",
+    "level": 2,
+    "ne": "भान्साको भान्सा",
+    "tmg": "कुदाप",
+    "flagged": false
+  },
+  {
+    "en": "book",
+    "category": "house",
+    "level": 1,
+    "ne": "पुस्तक",
+    "tmg": "छ्योइ",
+    "flagged": false
+  },
+  {
+    "en": "paper",
+    "category": "house",
+    "level": 1,
+    "ne": "कागज",
+    "tmg": "कागज",
+    "flagged": false
+  },
+  {
+    "en": "pen",
+    "category": "house",
+    "level": 1,
+    "ne": "कलम",
+    "tmg": "पेन",
+    "flagged": false
+  },
+  {
+    "en": "go",
+    "category": "verb",
+    "level": 1,
+    "ne": "जाऊँ जाऊँ",
+    "tmg": "निउ",
+    "flagged": false
+  },
+  {
+    "en": "come",
+    "category": "verb",
+    "level": 1,
+    "ne": "आउनुस् आउनुस्",
+    "tmg": "खास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "eat",
+    "category": "verb",
+    "level": 1,
+    "ne": "खानुस्",
+    "tmg": "चाबास्हे",
+    "flagged": false
+  },
+  {
+    "en": "drink",
+    "category": "verb",
+    "level": 1,
+    "ne": "पिउनुस्",
+    "tmg": "थुङ्स्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "see",
+    "category": "verb",
+    "level": 1,
+    "ne": "हेर्नुहोस्",
+    "tmg": "म्राङ्गो",
+    "flagged": false
+  },
+  {
+    "en": "hear",
+    "category": "verb",
+    "level": 1,
+    "ne": "सुन्नुस्",
+    "tmg": "ङ्यान्गो",
+    "flagged": false
+  },
+  {
+    "en": "speak",
+    "category": "verb",
+    "level": 1,
+    "ne": "बोल्नुस्।",
+    "tmg": "पाङ्स्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "walk",
+    "category": "verb",
+    "level": 1,
+    "ne": "हिँड्ने",
+    "tmg": "ब्राबा",
+    "flagged": false
+  },
+  {
+    "en": "run",
+    "category": "verb",
+    "level": 1,
+    "ne": "दौडिएर",
+    "tmg": "ह्यार्गो ह्यार्गो",
+    "flagged": false
+  },
+  {
+    "en": "sit",
+    "category": "verb",
+    "level": 1,
+    "ne": "बस्नुस्",
+    "tmg": "चिगो",
+    "flagged": false
+  },
+  {
+    "en": "stand",
+    "category": "verb",
+    "level": 1,
+    "ne": "उभिएर",
+    "tmg": "राप्गो",
+    "flagged": false
+  },
+  {
+    "en": "sleep",
+    "category": "verb",
+    "level": 1,
+    "ne": "निदाउने",
+    "tmg": "म्हेर्बा",
+    "flagged": false
+  },
+  {
+    "en": "work",
+    "category": "verb",
+    "level": 1,
+    "ne": "काम गर्ने",
+    "tmg": "गे लाबा",
+    "flagged": false
+  },
+  {
+    "en": "play",
+    "category": "verb",
+    "level": 1,
+    "ne": "खेल्नुस्।",
+    "tmg": "क्लाङ्स्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "learn",
+    "category": "verb",
+    "level": 1,
+    "ne": "सिक्नुस्",
+    "tmg": "लोप्लास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "read",
+    "category": "verb",
+    "level": 1,
+    "ne": "पढ्नुस्",
+    "tmg": "डोलास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "write",
+    "category": "verb",
+    "level": 1,
+    "ne": "लेख्नुस्",
+    "tmg": "ब्रिलास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "study",
+    "category": "verb",
+    "level": 2,
+    "ne": "अध्ययन गर्ने",
+    "tmg": "खेडोब लाबा",
+    "flagged": false
+  },
+  {
+    "en": "teach",
+    "category": "verb",
+    "level": 2,
+    "ne": "पढाउनुस्",
+    "tmg": "डोपिन्स्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "buy",
+    "category": "verb",
+    "level": 2,
+    "ne": "किनेर लैजाऊ",
+    "tmg": "ग्लुगो",
+    "flagged": false
+  },
+  {
+    "en": "give",
+    "category": "verb",
+    "level": 1,
+    "ne": "देऊ देऊ",
+    "tmg": "पिन्बा पिन्बा",
+    "flagged": false
+  },
+  {
+    "en": "take",
+    "category": "verb",
+    "level": 1,
+    "ne": "लैजाऊ",
+    "tmg": "बोर्लास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "make",
+    "category": "verb",
+    "level": 1,
+    "ne": "बनाउनुस्",
+    "tmg": "स्होलास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "open",
+    "category": "verb",
+    "level": 1,
+    "ne": "खुल्ला",
+    "tmg": "ठोङ्बा",
+    "flagged": false
+  },
+  {
+    "en": "close",
+    "category": "verb",
+    "level": 1,
+    "ne": "नजिकिने",
+    "tmg": "ङाम ङाम",
+    "flagged": false
+  },
+  {
+    "en": "want",
+    "category": "verb",
+    "level": 1,
+    "ne": "चाहियो",
+    "tmg": "सेम लाला",
+    "flagged": false
+  },
+  {
+    "en": "need",
+    "category": "verb",
+    "level": 1,
+    "ne": "आवश्यकता",
+    "tmg": "तोःबा",
+    "flagged": false
+  },
+  {
+    "en": "like",
+    "category": "verb",
+    "level": 1,
+    "ne": "जस्तो",
+    "tmg": "ह्राङ्बा",
+    "flagged": false
+  },
+  {
+    "en": "love",
+    "category": "verb",
+    "level": 1,
+    "ne": "माया माया",
+    "tmg": "चेगाइ लाबा",
+    "flagged": false
+  },
+  {
+    "en": "know",
+    "category": "verb",
+    "level": 1,
+    "ne": "थाहा पाउनु",
+    "tmg": "सेलास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "think",
+    "category": "verb",
+    "level": 2,
+    "ne": "सोच्नुस्",
+    "tmg": "सोचाब लालास्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "remember",
+    "category": "verb",
+    "level": 2,
+    "ne": "सम्झनुस्",
+    "tmg": "डान्स्ह्युगो",
+    "flagged": false
+  },
+  {
+    "en": "good",
+    "category": "adjective",
+    "level": 1,
+    "ne": "राम्रो",
+    "tmg": "ज्याबा",
+    "flagged": false
+  },
+  {
+    "en": "bad",
+    "category": "adjective",
+    "level": 1,
+    "ne": "नराम्रो",
+    "tmg": "आज्याबा",
+    "flagged": false
+  },
+  {
+    "en": "big",
+    "category": "adjective",
+    "level": 1,
+    "ne": "ठूलो",
+    "tmg": "ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन ग्रेन",
+    "flagged": false
+  },
+  {
+    "en": "small",
+    "category": "adjective",
+    "level": 1,
+    "ne": "सानो सानो",
+    "tmg": "जाजा जाजा",
+    "flagged": false
+  },
+  {
+    "en": "tall",
+    "category": "adjective",
+    "level": 1,
+    "ne": "अग्लो",
+    "tmg": "नोबा",
+    "flagged": false
+  },
+  {
+    "en": "short",
+    "category": "adjective",
+    "level": 1,
+    "ne": "छोटो",
+    "tmg": "तुन्बा",
+    "flagged": false
+  },
+  {
+    "en": "long",
+    "category": "adjective",
+    "level": 2,
+    "ne": "लामो समय",
+    "tmg": "ह्रेङ्बा ह्रेङ्बा",
+    "flagged": false
+  },
+  {
+    "en": "hot",
+    "category": "adjective",
+    "level": 1,
+    "ne": "तातो",
+    "tmg": "लेप्पा",
+    "flagged": false
+  },
+  {
+    "en": "cold",
+    "category": "adjective",
+    "level": 1,
+    "ne": "चिसो",
+    "tmg": "सिम्बा",
+    "flagged": false
+  },
+  {
+    "en": "warm",
+    "category": "adjective",
+    "level": 2,
+    "ne": "न्यानो",
+    "tmg": "लेप्पा",
+    "flagged": false
+  },
+  {
+    "en": "new",
+    "category": "adjective",
+    "level": 1,
+    "ne": "नयाँ",
+    "tmg": "छार छार",
+    "flagged": false
+  },
+  {
+    "en": "old",
+    "category": "adjective",
+    "level": 1,
+    "ne": "पुरानो",
+    "tmg": "खेप्पा खेप्पा",
+    "flagged": false
+  },
+  {
+    "en": "young",
+    "category": "adjective",
+    "level": 1,
+    "ne": "जवान",
+    "tmg": "छारिब्योन",
+    "flagged": false
+  },
+  {
+    "en": "beautiful",
+    "category": "adjective",
+    "level": 2,
+    "ne": "सुन्दरी",
+    "tmg": "जेबा जेबा",
+    "flagged": false
+  },
+  {
+    "en": "easy",
+    "category": "adjective",
+    "level": 2,
+    "ne": "सजिलो",
+    "tmg": "देबा",
+    "flagged": false
+  },
+  {
+    "en": "hard",
+    "category": "adjective",
+    "level": 2,
+    "ne": "गाह्रो",
+    "tmg": "काङाल",
+    "flagged": false
+  },
+  {
+    "en": "fast",
+    "category": "adjective",
+    "level": 1,
+    "ne": "व्रत बस्ने",
+    "tmg": "ङ्युङ्ने चिबा",
+    "flagged": false
+  },
+  {
+    "en": "slow",
+    "category": "adjective",
+    "level": 1,
+    "ne": "बिस्तारै",
+    "tmg": "गोल्छेसे",
+    "flagged": false
+  },
+  {
+    "en": "happy",
+    "category": "adjective",
+    "level": 1,
+    "ne": "खुसी हुने",
+    "tmg": "ताङ्बा ताङ्बा",
+    "flagged": false
+  },
+  {
+    "en": "sad",
+    "category": "adjective",
+    "level": 1,
+    "ne": "दुखेको",
+    "tmg": "दुङाल ताबा",
+    "flagged": false
+  },
+  {
+    "en": "tired",
+    "category": "adjective",
+    "level": 2,
+    "ne": "थकाइ लाग्ने",
+    "tmg": "ब्लाप्पा",
+    "flagged": false
+  },
+  {
+    "en": "hungry",
+    "category": "adjective",
+    "level": 1,
+    "ne": "भोक लागेको",
+    "tmg": "फोख्रेन्बा",
+    "flagged": false
+  },
+  {
+    "en": "clean",
+    "category": "adjective",
+    "level": 2,
+    "ne": "सफा गर्ने",
+    "tmg": "चाङ्मा",
+    "flagged": false
+  },
+  {
+    "en": "home",
+    "category": "place",
+    "level": 1,
+    "ne": "घरघर",
+    "tmg": "दिम दिम",
+    "flagged": false
+  },
+  {
+    "en": "school",
+    "category": "place",
+    "level": 1,
+    "ne": "विद्यालय",
+    "tmg": "लोप्खाङ",
+    "flagged": false
+  },
+  {
+    "en": "market",
+    "category": "place",
+    "level": 1,
+    "ne": "बजार बजार",
+    "tmg": "बजार",
+    "flagged": false
+  },
+  {
+    "en": "hospital",
+    "category": "place",
+    "level": 2,
+    "ne": "अस्पताल",
+    "tmg": "अस्पताल",
+    "flagged": false
+  },
+  {
+    "en": "temple",
+    "category": "place",
+    "level": 2,
+    "ne": "मन्दिर",
+    "tmg": "लाथान",
+    "flagged": false
+  },
+  {
+    "en": "road",
+    "category": "place",
+    "level": 1,
+    "ne": "सडक",
+    "tmg": "ग्याम ग्याम",
+    "flagged": false
+  },
+  {
+    "en": "city",
+    "category": "place",
+    "level": 1,
+    "ne": "नगरपालिका",
+    "tmg": "ग्यासा",
+    "flagged": false
+  },
+  {
+    "en": "village",
+    "category": "place",
+    "level": 1,
+    "ne": "गाउँ गाउँ",
+    "tmg": "नाम्सा नाम्सा",
+    "flagged": false
+  },
+  {
+    "en": "country",
+    "category": "place",
+    "level": 1,
+    "ne": "देश देश",
+    "tmg": "ह्युल",
+    "flagged": false
+  },
+  {
+    "en": "mountain",
+    "category": "place",
+    "level": 1,
+    "ne": "हिमाल",
+    "tmg": "ज्योमोगाङ",
+    "flagged": false
+  },
+  {
+    "en": "river",
+    "category": "place",
+    "level": 1,
+    "ne": "खोला",
+    "tmg": "गान्दि",
+    "flagged": false
+  },
+  {
+    "en": "sky",
+    "category": "place",
+    "level": 1,
+    "ne": "आकाश",
+    "tmg": "मु",
+    "flagged": false
+  },
+  {
+    "en": "sun",
+    "category": "place",
+    "level": 1,
+    "ne": "घाम",
+    "tmg": "दिनी",
+    "flagged": false
+  },
+  {
+    "en": "moon",
+    "category": "place",
+    "level": 1,
+    "ne": "चाँदनी",
+    "tmg": "ला ला",
+    "flagged": false
+  },
+  {
+    "en": "red",
+    "category": "color",
+    "level": 1,
+    "ne": "रातो",
+    "tmg": "वाला",
+    "flagged": false
+  },
+  {
+    "en": "blue",
+    "category": "color",
+    "level": 1,
+    "ne": "निलो",
+    "tmg": "पिङाइ",
+    "flagged": false
+  },
+  {
+    "en": "green",
+    "category": "color",
+    "level": 1,
+    "ne": "हरियो",
+    "tmg": "पिङ्गाइ",
+    "flagged": false
+  },
+  {
+    "en": "yellow",
+    "category": "color",
+    "level": 1,
+    "ne": "पहेँलो",
+    "tmg": "पहेँलो",
+    "flagged": false
+  },
+  {
+    "en": "black",
+    "category": "color",
+    "level": 1,
+    "ne": "कालो",
+    "tmg": "म्लाङ",
+    "flagged": false
+  },
+  {
+    "en": "white",
+    "category": "color",
+    "level": 1,
+    "ne": "सेतो",
+    "tmg": "तार",
+    "flagged": false
+  },
+  {
+    "en": "orange",
+    "category": "color",
+    "level": 2,
+    "ne": "सुन्तला",
+    "tmg": "सुन्तला",
+    "flagged": false
+  },
+  {
+    "en": "rain",
+    "category": "weather",
+    "level": 1,
+    "ne": "वर्षा वर्षा",
+    "tmg": "नाम नाम",
+    "flagged": false
+  },
+  {
+    "en": "wind",
+    "category": "weather",
+    "level": 2,
+    "ne": "हावा",
+    "tmg": "लाबा लाबा",
+    "flagged": false
+  },
+  {
+    "en": "snow",
+    "category": "weather",
+    "level": 2,
+    "ne": "हिउँ",
+    "tmg": "ग्लिङ",
+    "flagged": false
+  },
+  {
+    "en": "cloud",
+    "category": "weather",
+    "level": 2,
+    "ne": "बादल",
+    "tmg": "मेख्लि",
+    "flagged": false
+  },
+  {
+    "en": "tree",
+    "category": "nature",
+    "level": 1,
+    "ne": "रुखको बोट",
+    "tmg": "दोङला दोङ",
+    "flagged": false
+  },
+  {
+    "en": "flower",
+    "category": "nature",
+    "level": 1,
+    "ne": "फूलहरू",
+    "tmg": "म्हेन्दो",
+    "flagged": false
+  },
+  {
+    "en": "stone",
+    "category": "nature",
+    "level": 2,
+    "ne": "ढुङ्गा",
+    "tmg": "युङ्बा युङ्बा",
+    "flagged": false
+  },
+  {
+    "en": "name",
+    "category": "common",
+    "level": 1,
+    "ne": "नाम नाम",
+    "tmg": "मिन",
+    "flagged": false
+  },
+  {
+    "en": "time",
+    "category": "common",
+    "level": 1,
+    "ne": "समय",
+    "tmg": "दुइ",
+    "flagged": false
+  },
+  {
+    "en": "money",
+    "category": "common",
+    "level": 1,
+    "ne": "पैसा",
+    "tmg": "टाङ्गा",
+    "flagged": false
+  },
+  {
+    "en": "story",
+    "category": "common",
+    "level": 2,
+    "ne": "कथा",
+    "tmg": "राप",
+    "flagged": false
+  },
+  {
+    "en": "music",
+    "category": "common",
+    "level": 2,
+    "ne": "सङ्गीत",
+    "tmg": "व्हाइरिम",
+    "flagged": false
+  },
+  {
+    "en": "phone",
+    "category": "common",
+    "level": 1,
+    "ne": "फोन",
+    "tmg": "फोन",
+    "flagged": false
+  },
+  {
+    "en": "computer",
+    "category": "common",
+    "level": 2,
+    "ne": "कम्प्युटर",
+    "tmg": "कम्प्युटर",
+    "flagged": false
+  },
+  {
+    "en": "world",
+    "category": "common",
+    "level": 1,
+    "ne": "संसार",
+    "tmg": "जाम्बुलिङ",
+    "flagged": false
+  },
+  {
+    "en": "life",
+    "category": "common",
+    "level": 1,
+    "ne": "जीवन",
+    "tmg": "ल्हुइ",
+    "flagged": false
+  },
+  {
+    "en": "language",
+    "category": "common",
+    "level": 2,
+    "ne": "भाषा",
+    "tmg": "ग्योइ",
+    "flagged": false
+  },
+  {
+    "en": "word",
+    "category": "common",
+    "level": 2,
+    "ne": "शब्द",
+    "tmg": "छिक",
+    "flagged": false
+  },
+  {
+    "en": "question",
+    "category": "common",
+    "level": 2,
+    "ne": "प्रश्नप्रश्न",
+    "tmg": "ङ्योइबा ङ्योइबा",
+    "flagged": false
+  },
+  {
+    "en": "answer",
+    "category": "common",
+    "level": 2,
+    "ne": "उत्तर दिनुस्",
+    "tmg": "निसाल पिन्बा",
+    "flagged": false
+  }
+]

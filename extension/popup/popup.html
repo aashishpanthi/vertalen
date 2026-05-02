@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>vertalen</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <div class="brand">
+          <img src="../icons/icon48.png" alt="" class="brand__logo" />
+          <div class="brand__text">
+            <h1 class="brand__name">vertalen</h1>
+            <p class="brand__tag">Trilingual translation</p>
+          </div>
+        </div>
+        <button
+          class="icon-btn"
+          id="openOptions"
+          title="Settings"
+          aria-label="Open settings"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9.43 4-.05.59-.07.6 2.07 1.62-2 3.46-2.4-.97-.5.36c-.32.22-.66.42-1.01.59l-.55.27-.36 2.5h-4l-.36-2.5-.55-.27c-.35-.17-.69-.37-1.01-.59l-.5-.36-2.4.97-2-3.46L5.69 13.2l-.07-.6-.05-.6.05-.6.07-.6L3.62 9.18l2-3.46 2.4.97.5-.36c.32-.22.66-.42 1.01-.59l.55-.27.36-2.5h4l.36 2.5.55.27c.35.17.69.37 1.01.59l.5.36 2.4-.97 2 3.46-2.07 1.62.07.6.05.6Z"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <section
+        id="warningKey"
+        class="warning"
+        hidden
+        role="alert"
+        aria-live="polite"
+      >
+        <strong>API key required.</strong>
+        <span>vertalen needs your TMT team token to translate.</span>
+        <button class="warning__btn" id="warningOpenOptions">Add key</button>
+      </section>
+
+      <nav class="tabs" role="tablist" aria-label="Mode">
+        <button
+          class="tab tab--active"
+          id="tabTranslate"
+          role="tab"
+          aria-selected="true"
+          aria-controls="paneTranslate"
+        >
+          Translate
+        </button>
+        <button
+          class="tab"
+          id="tabLearn"
+          role="tab"
+          aria-selected="false"
+          aria-controls="paneLearn"
+        >
+          Learn
+        </button>
+      </nav>
+
+      <div id="paneTranslate" role="tabpanel" aria-labelledby="tabTranslate" class="pane">
+      <section class="lang-row" aria-label="Language picker">
+        <label class="lang">
+          <span class="lang__label">From</span>
+          <select id="srcLang" class="lang__select">
+            <option value="eng">English</option>
+            <option value="nep">नेपाली · Nepali</option>
+            <option value="tmg">तामाङ · Tamang</option>
+          </select>
+        </label>
+        <button
+          class="swap-btn"
+          id="swap"
+          title="Swap (Alt+S)"
+          aria-label="Swap source and target"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M7 7h11l-2.5-2.5L17 3l5 5-5 5-1.5-1.5L18 9H7V7Zm10 10H6l2.5 2.5L7 21l-5-5 5-5 1.5 1.5L6 15h11v2Z"
+            />
+          </svg>
+        </button>
+        <label class="lang">
+          <span class="lang__label">To</span>
+          <select id="tgtLang" class="lang__select">
+            <option value="nep">नेपाली · Nepali</option>
+            <option value="eng">English</option>
+            <option value="tmg">तामाङ · Tamang</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="translate-card">
+        <textarea
+          id="input"
+          class="translate-card__input"
+          placeholder="Type or paste text to translate…"
+          rows="4"
+          spellcheck="false"
+          aria-label="Text to translate"
+        ></textarea>
+        <div class="translate-card__meta">
+          <span id="charCount" class="meta-pill">0 chars</span>
+          <span id="detectedLang" class="meta-pill" hidden></span>
+        </div>
+        <div
+          id="output"
+          class="translate-card__output"
+          aria-live="polite"
+          aria-busy="false"
+        >
+          <span class="translate-card__placeholder">
+            Translation will appear here.
+          </span>
+        </div>
+        <div class="translate-card__actions">
+          <button class="btn btn--primary" id="translate">Translate</button>
+          <button class="btn btn--ghost" id="copy" disabled>Copy</button>
+        </div>
+      </section>
+
+      <section class="quick-actions">
+        <button class="action" id="translatePage">
+          <span class="action__icon" aria-hidden="true">📄</span>
+          <span class="action__body">
+            <strong>Translate this page</strong>
+            <span>Replace text in place with progress.</span>
+          </span>
+        </button>
+        <button class="action" id="openReader">
+          <span class="action__icon" aria-hidden="true">📰</span>
+          <span class="action__body">
+            <strong>Open in side-by-side reader</strong>
+            <span>Original and translation, paragraph by paragraph.</span>
+          </span>
+        </button>
+      </section>
+
+      <section class="history">
+        <header class="history__head">
+          <h2>Recent</h2>
+          <button class="link-btn" id="clearHistory">Clear</button>
+        </header>
+        <ul id="historyList" class="history__list" aria-live="polite"></ul>
+        <p id="historyEmpty" class="history__empty">
+          Translations you make will appear here.
+        </p>
+      </section>
+      </div><!-- /paneTranslate -->
+
+      <div id="paneLearn" role="tabpanel" aria-labelledby="tabLearn" class="pane" hidden>
+        <section
+          id="immersionPrompt"
+          class="warning"
+          hidden
+          role="alert"
+        >
+          <strong>Immersion mode is off.</strong>
+          <span>Turn it on to learn Tamang or Nepali while you browse.</span>
+          <button class="warning__btn" id="enableImmersion">Turn on</button>
+        </section>
+
+        <section class="learn-stats">
+          <div class="learn-stat" data-tone="streak">
+            <div class="learn-stat__big" id="streakCount">0</div>
+            <div class="learn-stat__label">day streak</div>
+          </div>
+          <div class="learn-stat" data-tone="today">
+            <div class="learn-stat__big" id="learnedToday">0</div>
+            <div class="learn-stat__label">
+              learned today / <span id="dailyGoal">5</span>
+            </div>
+          </div>
+          <div class="learn-stat" data-tone="mastered">
+            <div class="learn-stat__big" id="learnMastered">0</div>
+            <div class="learn-stat__label">mastered</div>
+          </div>
+        </section>
+
+        <section class="learn-progress">
+          <div class="learn-progress__bar">
+            <div id="dailyFill" class="learn-progress__fill"></div>
+          </div>
+          <p class="learn-progress__caption" id="dailyCaption">
+            Browse the web — vertalen will surface words from your target language.
+          </p>
+        </section>
+
+        <section class="quiz" id="quizCard">
+          <header class="quiz__head">
+            <h2>Quick quiz</h2>
+            <span class="quiz__lang" id="quizLang">Tamang</span>
+          </header>
+          <div class="quiz__body" id="quizBody">
+            <p class="quiz__hint">Loading…</p>
+          </div>
+          <div class="quiz__actions">
+            <button class="btn" id="quizSkip">Skip</button>
+            <button class="btn btn--primary" id="quizNew">New question</button>
+          </div>
+        </section>
+
+        <section class="quick-actions">
+          <button class="action" id="learnSettings">
+            <span class="action__icon" aria-hidden="true">⚙️</span>
+            <span class="action__body">
+              <strong>Immersion settings</strong>
+              <span>Density, target language, daily goal.</span>
+            </span>
+          </button>
+        </section>
+      </div>
+
+      <footer class="popup__footer">
+        <span>Press <kbd>Alt+T</kbd> on a selection · <kbd>Alt+Shift+T</kbd> for full page</span>
+      </footer>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

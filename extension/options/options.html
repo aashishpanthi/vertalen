@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>vertalen — Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__brand">
+        <img src="../icons/icon48.png" alt="" />
+        <div>
+          <h1>vertalen</h1>
+          <p>Settings &amp; preferences</p>
+        </div>
+      </div>
+      <div class="topbar__status" id="status" aria-live="polite"></div>
+    </header>
+
+    <main class="layout">
+      <nav class="sidenav" aria-label="Settings sections">
+        <a href="#api">API key</a>
+        <a href="#defaults">Defaults</a>
+        <a href="#behavior">Behavior</a>
+        <a href="#immersion">Immersion / Learn</a>
+        <a href="#performance">Performance</a>
+        <a href="#memory">Translation memory</a>
+        <a href="#history">History</a>
+        <a href="#about">About</a>
+      </nav>
+
+      <section class="content">
+        <article id="api" class="card">
+          <header>
+            <h2>API key</h2>
+            <p>
+              Your TMT team token is stored locally in your browser profile and
+              is sent only to <code>tmt.ilprl.ku.edu.np</code>.
+            </p>
+          </header>
+          <form class="api-form" id="apiForm">
+            <label class="field">
+              <span class="field__label">Team token</span>
+              <div class="field__input-row">
+                <input
+                  type="password"
+                  id="apiKey"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="team_xxxxxxxxxxxxxxxx"
+                />
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  id="toggleVisibility"
+                  aria-label="Toggle visibility"
+                >
+                  Show
+                </button>
+              </div>
+              <span class="field__hint">
+                Get your token from the registration confirmation email.
+              </span>
+            </label>
+            <div class="api-form__actions">
+              <button type="submit" class="btn btn--primary" id="saveKey">
+                Save
+              </button>
+              <button type="button" class="btn" id="testKey">Test connection</button>
+              <button type="button" class="btn btn--danger" id="clearKey">
+                Remove
+              </button>
+            </div>
+            <p id="testResult" class="test-result" aria-live="polite"></p>
+          </form>
+        </article>
+
+        <article id="defaults" class="card">
+          <header>
+            <h2>Default languages</h2>
+            <p>Used when auto-detect is off, and as the seed for the popup.</p>
+          </header>
+          <div class="defaults-grid">
+            <label class="field">
+              <span class="field__label">Source</span>
+              <select id="defaultSrc">
+                <option value="eng">English</option>
+                <option value="nep">Nepali</option>
+                <option value="tmg">Tamang</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field__label">Target</span>
+              <select id="defaultTgt">
+                <option value="nep">Nepali</option>
+                <option value="eng">English</option>
+                <option value="tmg">Tamang</option>
+              </select>
+            </label>
+          </div>
+        </article>
+
+        <article id="behavior" class="card">
+          <header>
+            <h2>Behavior</h2>
+          </header>
+          <div class="toggles">
+            <label class="toggle">
+              <input type="checkbox" id="autoDetectSrc" />
+              <span class="toggle__title">Auto-detect source language</span>
+              <span class="toggle__hint">Use Devanagari heuristic to pick the source.</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="showFloatingButton" />
+              <span class="toggle__title">Show floating translate button on selection</span>
+              <span class="toggle__hint">Disable to use only context menu and keyboard shortcuts.</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="inlineTooltip" />
+              <span class="toggle__title">Display tooltip near selection</span>
+              <span class="toggle__hint">Disable to send results only to the popup.</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="fullPagePreserveOriginal" />
+              <span class="toggle__title">Preserve originals on full-page translate</span>
+              <span class="toggle__hint">Hover translated nodes to see the original text.</span>
+            </label>
+          </div>
+        </article>
+
+        <article id="immersion" class="card">
+          <header>
+            <h2>Immersion / learn mode</h2>
+            <p>
+              Sprinkle Tamang or Nepali vocabulary into the English pages
+              you read, hover to see the original, and quiz yourself in the
+              popup. Designed to help everyday speakers contribute to keeping
+              <strong>Tamang</strong> alive.
+            </p>
+          </header>
+          <div class="toggles">
+            <label class="toggle">
+              <input type="checkbox" id="immersionEnabled" />
+              <span class="toggle__title">Enable immersion mode</span>
+              <span class="toggle__hint">When on, vertalen replaces ~3% of common English words with the language you're learning.</span>
+            </label>
+          </div>
+          <div class="defaults-grid">
+            <label class="field">
+              <span class="field__label">Learning</span>
+              <select id="immersionTarget">
+                <option value="tmg">Tamang</option>
+                <option value="nep">Nepali</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field__label">
+                Difficulty (max level)
+                <strong id="immersionMaxLevelLabel">1</strong>
+              </span>
+              <input
+                type="range"
+                id="immersionMaxLevel"
+                min="1"
+                max="3"
+                step="1"
+              />
+            </label>
+            <label class="field">
+              <span class="field__label">
+                Density
+                <strong id="immersionDensityLabel">3%</strong>
+              </span>
+              <input
+                type="range"
+                id="immersionDensity"
+                min="1"
+                max="10"
+                step="1"
+              />
+            </label>
+            <label class="field">
+              <span class="field__label">Daily goal (words)</span>
+              <input
+                type="number"
+                id="immersionDailyGoal"
+                min="1"
+                max="50"
+                step="1"
+              />
+            </label>
+          </div>
+          <div class="memory-stats" style="margin-top: 0.4rem;">
+            <div class="stat">
+              <strong id="immStatStreak">0</strong>
+              <span>day streak</span>
+            </div>
+            <div class="stat">
+              <strong id="immStatSeen">0</strong>
+              <span>words encountered</span>
+            </div>
+            <div class="stat">
+              <strong id="immStatMastered">0</strong>
+              <span>mastered</span>
+            </div>
+          </div>
+          <div class="memory-actions">
+            <button class="btn btn--danger" id="immReset">Reset progress</button>
+          </div>
+        </article>
+
+        <article id="performance" class="card">
+          <header>
+            <h2>Performance</h2>
+            <p>
+              The TMT API limits each token to 60 requests / minute. Setting this
+              lower leaves room for other tools you may run.
+            </p>
+          </header>
+          <label class="field">
+            <span class="field__label">
+              Requests per minute
+              <strong id="rateValue">55</strong>
+            </span>
+            <input
+              type="range"
+              min="10"
+              max="60"
+              step="1"
+              id="rateLimitPerMinute"
+            />
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="enableTranslationMemory" />
+            <span class="toggle__title">Use translation memory</span>
+            <span class="toggle__hint">Skip the API for sentences you have translated before.</span>
+          </label>
+        </article>
+
+        <article id="memory" class="card">
+          <header>
+            <h2>Translation memory</h2>
+            <p>
+              Locally cached translations. Export this file to share with your
+              team or move between devices.
+            </p>
+          </header>
+          <div class="memory-stats">
+            <div class="stat">
+              <strong id="tmCount">0</strong>
+              <span>cached pairs</span>
+            </div>
+            <div class="stat">
+              <strong id="tmSize">0 KB</strong>
+              <span>storage used</span>
+            </div>
+          </div>
+          <div class="memory-actions">
+            <button class="btn" id="exportTmJson">Export JSON</button>
+            <button class="btn" id="exportTmCsv">Export CSV</button>
+            <button class="btn btn--danger" id="clearTm">Clear memory</button>
+          </div>
+        </article>
+
+        <article id="history" class="card">
+          <header>
+            <h2>History</h2>
+          </header>
+          <div class="memory-stats">
+            <div class="stat">
+              <strong id="historyCount">0</strong>
+              <span>recent translations</span>
+            </div>
+            <label class="field">
+              <span class="field__label">Max history items</span>
+              <input
+                type="number"
+                id="maxHistory"
+                min="0"
+                max="500"
+                step="5"
+              />
+            </label>
+          </div>
+          <div class="memory-actions">
+            <button class="btn" id="exportHistory">Export history (JSON)</button>
+            <button class="btn btn--danger" id="clearHistoryBtn">Clear history</button>
+          </div>
+        </article>
+
+        <article id="about" class="card">
+          <header>
+            <h2>About</h2>
+          </header>
+          <p>
+            <strong>vertalen</strong> is an open-source Chrome extension built
+            for the Google TMT Hackathon 2026, powered by the TMT translation
+            system at Kathmandu University.
+          </p>
+          <ul class="about-list">
+            <li><strong>Version:</strong> <span id="version">1.0.0</span></li>
+            <li><strong>License:</strong> MIT</li>
+            <li>
+              <strong>API endpoint:</strong>
+              <code>https://tmt.ilprl.ku.edu.np/lang-translate</code>
+            </li>
+            <li>
+              <strong>Source &amp; release:</strong>
+              <a href="https://github.com/aashishpanthi/vertalen" target="_blank" rel="noreferrer">github.com/aashishpanthi/vertalen</a>
+            </li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

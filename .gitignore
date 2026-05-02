@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+dist/
+release/
+*.zip
+
+.env
+.env.*
+*.tmt-key
+secrets.*
+
+.vscode/
+.idea/
+*.swp
+
+extension/icons/icon-source.png
