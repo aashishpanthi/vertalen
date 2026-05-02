@@ -66,11 +66,11 @@ The vocabulary set ships pre-translated as `extension/lib/vocab.json` (~200 cura
 
 ## Demo video
 
-> Replace this placeholder with your demo URL (e.g. GitHub Release asset or YouTube).
+📹 **Demo:** [vertalen — 3-minute walkthrough](https://youtu.be/REPLACE_WITH_VIDEO_ID)
 
-📹 **Demo:** _https://youtu.be/REPLACE_WITH_VIDEO_ID_
+The video covers: install → API key entry → selection translation → full-page translation → right-click menu → side-by-side reader → immersion learning + quiz → settings.
 
-The video shows: install → API key entry → selection translation → full-page translation → side-by-side reader → settings.
+> If the link above is still a placeholder, the video is being uploaded — check back, or browse the [latest GitHub Release](https://github.com/aashishpanthi/vertalen/releases/latest) for the recorded asset.
 
 ---
 
@@ -78,7 +78,7 @@ The video shows: install → API key entry → selection translation → full-pa
 
 `vertalen` ships as an unpacked Chrome extension. **No build tools required.**
 
-1. **Download** `vertalen-1.0.0.zip` from the GitHub Release page (or clone this repo).
+1. **Download** [`vertalen-1.0.0.zip`](https://github.com/aashishpanthi/vertalen/releases/download/v1.0.0/vertalen-1.0.0.zip) from the [GitHub Releases page](https://github.com/aashishpanthi/vertalen/releases) (or clone this repo).
 2. Unzip the archive somewhere on disk.
 3. Open Chrome and navigate to `chrome://extensions`.
 4. Toggle **Developer mode** on (top-right).
