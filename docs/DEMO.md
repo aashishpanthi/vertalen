@@ -1,5 +1,7 @@
 # vertalen — Demo Script
 
+**Recorded demo:** [YouTube — vertalen walkthrough](https://youtu.be/kSGWws1t2t0)
+
 A 5–6 minute walk-through of the main features. Use it as a video script or rehearsal checklist.
 
 > **Lead with the story.** The first 30 seconds can explain *why* Tamang-focused tooling matters before diving into UI.

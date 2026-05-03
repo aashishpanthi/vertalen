@@ -66,11 +66,13 @@ The vocabulary set ships pre-translated as `extension/lib/vocab.json` (~200 cura
 
 ## Demo video
 
-📹 **Demo:** [vertalen — 3-minute walkthrough](https://youtu.be/REPLACE_WITH_VIDEO_ID)
+**Watch on YouTube:** [vertalen — 3-minute walkthrough](https://youtu.be/kSGWws1t2t0)
+
+GitHub readmes do not run embedded YouTube iframes, so the clickable preview below opens the same video in a new tab:
+
+[![Watch the vertalen demo on YouTube](https://img.youtube.com/vi/kSGWws1t2t0/hqdefault.jpg)](https://youtu.be/kSGWws1t2t0)
 
 The video covers: install → API key entry → selection translation → full-page translation → right-click menu → side-by-side reader → immersion learning + quiz → settings.
-
-> If the link above is still a placeholder, the video is being uploaded — check back, or browse the [latest GitHub Release](https://github.com/aashishpanthi/vertalen/releases/latest) for the recorded asset.
 
 ---
 
